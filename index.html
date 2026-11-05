@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cashflow Aduana - Ingresos Confirmados</title>
+<style>
+  :root{
+    color-scheme: light;
+    --brand-navy:#15335c;
+    --brand-navy-dark:#0d2342;
+    --surface-1:#fcfcfb;
+    --page:#f3f4f6;
+    --text-primary:#0b0b0b;
+    --text-secondary:#52514e;
+    --muted:#898781;
+    --grid:#e1e0d9;
+    --border:rgba(11,11,11,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--page);color:var(--text-primary);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+  header.topbar{
+    background:linear-gradient(180deg,var(--brand-navy) 0%,var(--brand-navy-dark) 100%);
+    color:#fff; padding:14px 24px; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:18px;
+    position:relative;
+  }
+  header.topbar .logo-wrap{display:flex;align-items:center;}
+  header.topbar img{height:120px; display:block; border-radius:12px;}
+  header.topbar h1{
+    font-size:28px; font-weight:700; margin:0; letter-spacing:.2px; text-align:center;
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); white-space:nowrap;
+  }
+  header.topbar .loadbox{display:flex; flex-direction:column; align-items:flex-end; gap:4px;}
+  header.topbar .loadbox small{color:#c9d4e6; font-size:11.5px;}
+  .btn{
+    background:#fff; color:var(--brand-navy); border:none; border-radius:8px;
+    padding:9px 16px; font-size:13.5px; font-weight:600; cursor:pointer;
+  }
+  .btn:hover{background:#eef2f8;}
+  .btn.ghost{background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4);}
+  .btn.ghost:hover{background:rgba(255,255,255,.1);}
+
+  .country-tabs{
+    background:var(--brand-navy-dark); display:flex; gap:12px; padding:12px 24px;
+    overflow-x:auto; justify-content:center;
+  }
+  .country-tab{
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.25); border-radius:8px;
+    color:#d7deea; font-size:15px; font-weight:700; padding:11px 26px; cursor:pointer; white-space:nowrap;
+  }
+  .country-tab:hover{color:#fff; border-color:rgba(255,255,255,.55); background:rgba(255,255,255,.12);}
+  .country-tab.active{color:var(--brand-navy); background:#fff; border-color:#fff;}
+
+  .consig-tabs{
+    display:flex; gap:8px; padding:12px 24px 0; max-width:1100px; margin:0 auto; justify-content:center;
+  }
+  .consig-tab{
+    background:#fff; border:1px solid var(--border); border-radius:7px;
+    color:var(--text-secondary); font-size:13px; font-weight:600; padding:7px 18px; cursor:pointer; white-space:nowrap;
+  }
+  .consig-tab:hover{border-color:var(--brand-navy);}
+  .consig-tab.active{color:#fff; background:var(--brand-navy); border-color:var(--brand-navy);}
+
+  main{max-width:1100px; margin:0 auto; padding:18px 24px 60px;}
+
+  .update-warning{
+    margin:0 auto 14px; background:#fdf3e0; border:1px solid #eda100;
+    color:#7a5400; border-radius:10px; padding:10px 16px; font-size:13px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .update-warning button{background:none; border:none; color:#7a5400; font-size:18px; line-height:1; cursor:pointer; padding:0 2px;}
+
+  .tablecard{background:var(--surface-1); border:1px solid var(--border); border-radius:12px; overflow:hidden;}
+  .tablecard .tc-head{padding:14px 18px 10px; display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:6px;}
+  .tablecard .tc-head h2{font-size:15px; margin:0;}
+  .tablecard .tc-head .tc-note{font-size:12px; color:var(--muted);}
+  .tablewrap{overflow:auto; border-top:1px solid var(--grid);}
+  table.cf{border-collapse:collapse; width:100%; font-size:13px;}
+  table.cf th, table.cf td{padding:8px 14px; border-bottom:1px solid var(--grid); text-align:right; white-space:nowrap;}
+  table.cf th:first-child, table.cf td:first-child{text-align:left;}
+  table.cf thead th{background:#eef1f5; color:var(--text-secondary); font-weight:700; position:sticky; top:0; z-index:2;}
+  table.cf tbody tr:nth-child(even) td{background:#fafafa;}
+  table.cf tfoot td{font-weight:700; background:#f6f3e8; border-top:2px solid var(--grid); color:var(--brand-navy);}
+
+  .view-tabs{display:flex; gap:0; margin:0 auto 14px; justify-content:center; border-bottom:1px solid var(--grid);}
+  .view-tab{
+    background:none; border:none; border-bottom:3px solid transparent; margin-bottom:-1px;
+    color:var(--text-secondary); font-size:14px; font-weight:700; padding:9px 22px; cursor:pointer;
+  }
+  .view-tab:hover{color:var(--brand-navy);}
+  .view-tab.active{color:var(--brand-navy); border-bottom-color:var(--brand-navy);}
+
+  .tc-actions{display:flex; gap:8px; flex-wrap:wrap;}
+  table.hist thead th{position:static; text-align:center;}
+  table.hist th.grp, table.hist td.grp{border-left:2px solid #c9ced8;}
+  table.hist th:first-child, table.hist td:first-child{position:sticky; left:0; z-index:1; background:#fff; border-right:1px solid var(--grid);}
+  table.hist thead th:first-child{background:#eef1f5;}
+  table.hist tbody tr:nth-child(even) td:first-child{background:#fafafa;}
+  table.hist tfoot td:first-child{background:#f6f3e8;}
+  table.hist .snap-date{font-size:13px; color:var(--brand-navy);}
+  table.hist .snap-type{display:inline-block; font-size:10.5px; font-weight:700; border-radius:4px; padding:1px 6px; margin-left:6px; vertical-align:1px;}
+  table.hist .snap-type.auto{background:#e3ecf8; color:var(--brand-navy);}
+  table.hist .snap-type.manual{background:#fdf3e0; color:#7a5400;}
+  table.hist .snap-del{background:none; border:none; color:var(--muted); font-size:15px; cursor:pointer; margin-left:4px; padding:0 2px;}
+  table.hist .snap-del:hover{color:#b3261e;}
+  table.hist td.na{color:var(--muted); text-align:center;}
+
+  .empty-state{padding:60px 20px; text-align:center; color:var(--muted);}
+  .empty-state .btn{margin-top:14px;}
+
+  .coming-soon{padding:60px 20px; text-align:center; color:var(--muted);}
+
+  footer.foot{max-width:1100px; margin:0 auto; padding:0 24px 30px; color:var(--muted); font-size:11.5px;}
+
+  @media (max-width: 768px){
+    header.topbar{grid-template-columns:1fr; justify-items:center; text-align:center; padding:12px 14px; gap:8px;}
+    header.topbar .logo-wrap{justify-content:center;}
+    header.topbar img{height:60px;}
+    header.topbar h1{position:static; transform:none; font-size:16px; white-space:normal;}
+    header.topbar .loadbox{align-items:center;}
+    .country-tabs{padding:10px 12px; gap:8px;}
+    .country-tab{padding:9px 16px; font-size:13px;}
+    .consig-tabs{padding:10px 10px 0;}
+    main{padding:12px 10px 40px;}
+    table.cf th, table.cf td{padding:7px 8px; font-size:12px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo-wrap">
+    <img src="LOGO_ALKON.png" alt="AlKon Global Brands">
+  </div>
+  <h1>Cashflow Aduana - Ingresos Confirmados</h1>
+  <div class="loadbox">
+    <button class="btn" id="btnLoad">Actualizar</button>
+    <small id="loadStatus">Sin datos cargados</small>
+  </div>
+</header>
+
+<div class="country-tabs" id="countryTabs"></div>
+<div class="consig-tabs" id="consigTabs" style="display:none;"></div>
+
+<main>
+  <div class="update-warning" id="updateWarning" style="display:none;">
+    <span id="updateWarningText"></span>
+    <button id="updateWarningClose" title="Cerrar">&times;</button>
+  </div>
+
+  <div id="comingSoon" class="coming-soon" style="display:none;">
+    <p>Próximamente para este país.</p>
+  </div>
+
+  <div id="emptyState" class="empty-state" style="display:none;">
+    <p id="emptyStateMsg">Cargando datos desde Google Sheets...</p>
+    <button class="btn" id="btnLoadEmpty" style="background:var(--brand-navy); color:#fff;">Reintentar</button>
+  </div>
+
+  <div id="dashboard" style="display:none;">
+    <div class="view-tabs">
+      <button type="button" class="view-tab active" id="viewTabActual">Cuadro actual</button>
+      <button type="button" class="view-tab" id="viewTabHist">Historial</button>
+    </div>
+
+    <div class="tablecard" id="viewHist" style="display:none;">
+      <div class="tc-head">
+        <h2 id="histTitle">Historial</h2>
+        <span class="tc-note" id="histNote"></span>
+        <div class="tc-actions">
+          <button type="button" class="btn" id="btnSnapNow" style="background:var(--brand-navy); color:#fff;">Guardar foto ahora</button>
+          <button type="button" class="btn" id="btnExportHist" style="border:1px solid var(--brand-navy);">Exportar historial a Excel</button>
+        </div>
+      </div>
+      <div class="tablewrap">
+        <table class="cf hist">
+          <thead id="histHead"></thead>
+          <tbody id="histBody"></tbody>
+          <tfoot id="histFoot"></tfoot>
+        </table>
+      </div>
+      <div id="histEmpty" class="empty-state" style="display:none;">Todavía no hay fotos guardadas para este país.</div>
+    </div>
+
+    <div class="tablecard" id="viewActual">
+      <div class="tc-head">
+        <h2 id="tcTitle">Cashflow Aduana por mes de pago</h2>
+        <span class="tc-note" id="tcNote"></span>
+        <button type="button" class="btn" id="btnExport" style="background:var(--brand-navy); color:#fff;">Exportar a Excel</button>
+      </div>
+      <div class="tablewrap">
+        <table class="cf">
+          <thead>
+            <tr>
+              <th>Mes de pago</th>
+              <th>Suma de FOB Supplier</th>
+              <th>Suma de FOB Aduana</th>
+              <th>Suma de Presupuesto Aduana</th>
+            </tr>
+          </thead>
+          <tbody id="cfBody"></tbody>
+          <tfoot>
+            <tr>
+              <td id="cfTotalLabel">Total</td>
+              <td id="cfTotalFob">—</td>
+              <td id="cfTotalFobAduana">—</td>
+              <td id="cfTotalPresupuesto">—</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="foot" id="footNote"></footer>
+
+<script>
+const COUNTRIES = [
+  {code:'AR', name:'Argentina', sheetId:'1Uv_dFJEiyKUqN5J38mgrHAWF8M3j_RJYBWHvr8z5Np4', sheetName:'STATUS COMEX', fobAduanaCol:'FOB ADUANA', presupuestoCol:'PRESUPUESTO ADUANA', pagoAduanaCol:'PAGO ADUANA'},
+  {code:'CL', name:'Chile', sheetId:'1ELfFcCmz7xlDYC8E71ybNrjs_zvlLafxfCDsRzlxwbw', sheetGid:'44719060', fobAduanaCol:'FOB ADUANA', presupuestoCol:'PRESUPUESTO ADUANA + DESPACHANTE', pagoAduanaCol:'MES ADUANA'},
+  {code:'UY', name:'Uruguay', sheetId:'18fHPhli2v4MOB3DMVMY1BY7pSmBjlZRliQvvkv18vCg', sheetGid:'399342286', fobAduanaCol:'FOB ADUANA', presupuestoCol:'PRESUPUESTO ADUANA + DESPACHANTE', pagoAduanaCol:'MES ADUANA'},
+  {code:'CO', name:'Colombia', sheetId:'1QyQK6_9itUUqoghg7DvqHnPT3SpILlNaolSHzQO8f0o', sheetGid:'0', fobAduanaCol:'FOB ADUANA', presupuestoCol:'PRESUPUESTO ADUANA', pagoAduanaCol:'PAGO ADUANA'}
+];
+const EXCLUDE_PRODUCT_TOKENS = ['CAJAS VACIAS','REPUESTOS','MUESTRAS'];
+const MES_ORDER = {ENERO:1,FEBRERO:2,MARZO:3,ABRIL:4,MAYO:5,JUNIO:6,JULIO:7,AGOSTO:8,SEPTIEMBRE:9,OCTUBRE:10,NOVIEMBRE:11,DICIEMBRE:12};
+const MIN_PAGO_SORT_KEY = 2026*100+1;
+
+let CURRENT_COUNTRY = null;
+let ROWS = [];
+let META = null;
+let CONSIGNEES = [];
+let ACTIVE_CONSIGNEE = null;
+
+function currentCountry(){ return COUNTRIES.find(c=>c.code===CURRENT_COUNTRY); }
+function lsKey(code){ return 'cashflow_aduana_data_v1_'+code; }
+
+function fmtUsd(n){
+  return 'USD '+Math.round(n).toLocaleString('es-AR');
+}
+
+function parsePagoAduana(raw){
+  const v = (raw||'').trim();
+  if(!v) return null;
+  if(v.toUpperCase()==='CANCELADO') return null;
+  const m = v.match(/^([A-ZÁÉÍÓÚ]+)\.(\d{4})$/);
+  if(m && MES_ORDER[m[1]]){
+    const year = +m[2];
+    if(year < 2000) return null;
+    return {label:v, sortKey:year*100+MES_ORDER[m[1]], isMonth:true};
+  }
+  return {label:v, sortKey:null, isMonth:false};
+}
+
+// Las llamadas JSONP comparten un callback global: se ejecutan de a una.
+let GVIZ_CHAIN = Promise.resolve();
+function loadGvizJsonp(url){
+  const p = GVIZ_CHAIN.then(()=>loadGvizJsonpRaw(url));
+  GVIZ_CHAIN = p.catch(()=>{});
+  return p;
+}
+function loadGvizJsonpRaw(url){
+  return new Promise((resolve, reject)=>{
+    window.google = window.google || {};
+    window.google.visualization = window.google.visualization || {};
+    window.google.visualization.Query = window.google.visualization.Query || {};
+    const prevSetResponse = window.google.visualization.Query.setResponse;
+    let done = false;
+    const cleanup = ()=>{ window.google.visualization.Query.setResponse = prevSetResponse; script.remove(); };
+    window.google.visualization.Query.setResponse = function(data){
+      done = true; cleanup();
+      if(data.status !== 'ok') reject(new Error('Google Sheets devolvió un error: '+(data.errors&&data.errors[0]&&data.errors[0].detailed_message||data.status)));
+      else resolve(data);
+    };
+    const script = document.createElement('script');
+    script.src = url;
+    script.onerror = ()=>{ if(!done){ cleanup(); reject(new Error('No se pudo conectar con Google Sheets.')); } };
+    document.head.appendChild(script);
+    setTimeout(()=>{ if(!done){ cleanup(); reject(new Error('Tiempo de espera agotado conectando con Google Sheets.')); } }, 20000);
+  });
+}
+
+function num(v){
+  if(typeof v==='number') return v;
+  if(typeof v==='string') return parseFloat(v.replace(/[^0-9,.-]/g,'').replace(/\.(?=.*[.,])/g,'').replace(',','.'))||0;
+  return 0;
+}
+function txt(v, fallback){
+  return (typeof v==='string' && v.trim()!=='') ? v.trim() : fallback;
+}
+
+function parseGvizTable(headerTable, dataTable, country){
+  const nCols = dataTable.cols.length;
+  const headerRow = new Array(nCols).fill(null);
+  (headerTable.rows[0] && headerTable.rows[0].c || []).forEach((cell,i)=>{ headerRow[i] = (cell && cell.v!==undefined) ? cell.v : null; });
+  const cols = {};
+  headerRow.forEach((v,i)=>{ if(typeof v==='string' && v.trim()!=='') cols[v.trim().toUpperCase()] = i; });
+  const neededHeaders = ['CONSIGNEE','ESTADO','PRODUCTO','FOB SUPPLIER', country.fobAduanaCol, country.presupuestoCol, country.pagoAduanaCol];
+  const missing = neededHeaders.filter(h=>!(h in cols));
+  if(missing.length) throw new Error('No se encontraron estas columnas en Google Sheets: '+missing.join(', '));
+
+  const grid = dataTable.rows.map(row=>{
+    const arr = new Array(nCols).fill(null);
+    (row.c||[]).forEach((cell,i)=>{ arr[i] = (cell && cell.v!==undefined) ? cell.v : null; });
+    return arr;
+  });
+
+  const rows = [];
+  let totalDataRows = grid.length;
+  let usedRows = 0;
+  for(let r=0; r<grid.length; r++){
+    const row = grid[r];
+    const get = (name)=> row[cols[name]];
+    const estado = txt(get('ESTADO'), '').toUpperCase();
+    if(!estado) continue;
+    if(estado==='CANCELADO') continue;
+    const consignee = txt(get('CONSIGNEE'), '');
+    if(!consignee) continue;
+    const producto = txt(get('PRODUCTO'), '');
+    if(producto && EXCLUDE_PRODUCT_TOKENS.some(tok=>producto.toUpperCase().includes(tok))) continue;
+    const pago = parsePagoAduana(get(country.pagoAduanaCol));
+    if(!pago) continue;
+    if(pago.isMonth && pago.sortKey < MIN_PAGO_SORT_KEY) continue;
+    usedRows++;
+    rows.push({
+      consignee,
+      estado,
+      fob: num(get('FOB SUPPLIER')),
+      fobAduana: num(get(country.fobAduanaCol)),
+      presupuesto: num(get(country.presupuestoCol)),
+      pagoLabel: pago.label,
+      pagoSortKey: pago.sortKey,
+      pagoIsMonth: pago.isMonth
+    });
+  }
+  return {rows, meta:{loadedAt:new Date(), totalSheetRows:totalDataRows, usedRows}};
+}
+
+function buildBuckets(rows){
+  const buckets = new Map();
+  rows.forEach(r=>{
+    if(!buckets.has(r.pagoLabel)) buckets.set(r.pagoLabel, {label:r.pagoLabel, sortKey:r.pagoSortKey, isMonth:r.pagoIsMonth, fob:0, fobAduana:0, presupuesto:0});
+    const b = buckets.get(r.pagoLabel);
+    b.fob += r.fob; b.fobAduana += r.fobAduana; b.presupuesto += r.presupuesto;
+  });
+  return [...buckets.values()].sort(bucketCmp);
+}
+function bucketCmp(a,b){
+  if(a.isMonth && b.isMonth) return a.sortKey - b.sortKey;
+  if(a.isMonth && !b.isMonth) return -1;
+  if(!a.isMonth && b.isMonth) return 1;
+  return a.label.localeCompare(b.label,'es');
+}
+
+/* ===================== HISTORIAL ===================== */
+const HIST_KEY = 'cashflow_aduana_hist_v1';
+const AUTO_DAYS = 15;
+const DAY_MS = 86400000;
+let ACTIVE_VIEW = 'actual';
+
+function loadHist(){
+  try{ return JSON.parse(localStorage.getItem(HIST_KEY)) || {}; }catch(e){ return {}; }
+}
+function saveHist(h){
+  try{ localStorage.setItem(HIST_KEY, JSON.stringify(h)); return true; }
+  catch(e){ console.warn('No se pudo guardar historial', e); alert('No se pudo guardar el historial en este navegador.'); return false; }
+}
+function startOfDay(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
+function fmtDate(d){ return d.toLocaleDateString('es-AR'); }
+function fmtDateTime(d){ return d.toLocaleDateString('es-AR')+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); }
+
+function buildSnapshot(rows, type){
+  const consignees = {};
+  [...new Set(rows.map(r=>r.consignee))].forEach(c=>{
+    consignees[c] = buildBuckets(rows.filter(r=>r.consignee===c)).map(b=>({
+      label:b.label, sortKey:b.sortKey, isMonth:b.isMonth,
+      fob:Math.round(b.fob), fobAduana:Math.round(b.fobAduana), presupuesto:Math.round(b.presupuesto)
+    }));
+  });
+  return {savedAt:new Date().toISOString(), type, consignees};
+}
+function addSnapshot(code, rows, type){
+  if(!rows || !rows.length) return false;
+  const h = loadHist();
+  (h[code] = h[code] || []).push(buildSnapshot(rows, type));
+  return saveHist(h);
+}
+function lastAutoDate(code){
+  const autos = (loadHist()[code] || []).filter(s=>s.type==='auto');
+  return autos.length ? new Date(autos[autos.length-1].savedAt) : null;
+}
+// Cadencia fija de 15 días contada desde la última foto automática (las manuales no la corren).
+function isAutoDue(code){
+  const last = lastAutoDate(code);
+  if(!last) return true;
+  return Math.round((startOfDay(new Date()) - startOfDay(last))/DAY_MS) >= AUTO_DAYS;
+}
+function maybeAutoSnapshot(code, rows){
+  if(isAutoDue(code) && addSnapshot(code, rows, 'auto') && code===CURRENT_COUNTRY) renderHistory();
+}
+async function runAutoSnapshots(){
+  for(const c of COUNTRIES){
+    if(!isAutoDue(c.code)) continue;
+    try{
+      const {rows} = await fetchCountryData(c);
+      maybeAutoSnapshot(c.code, rows);
+    }catch(e){ console.warn('Foto automática falló para '+c.name, e); }
+  }
+}
+
+function saveManualSnapshot(){
+  if(!ROWS.length){ alert('No hay datos cargados para guardar.'); return; }
+  if(addSnapshot(CURRENT_COUNTRY, ROWS, 'manual')) renderHistory();
+}
+function deleteSnapshot(idx){
+  const h = loadHist();
+  const list = h[CURRENT_COUNTRY] || [];
+  const s = list[idx];
+  if(!s) return;
+  const country = currentCountry();
+  if(!confirm('¿Borrar la foto del '+fmtDateTime(new Date(s.savedAt))+' de '+country.name+'?\nSe borra para todos los consignees de este país.')) return;
+  list.splice(idx,1);
+  h[CURRENT_COUNTRY] = list;
+  if(saveHist(h)) renderHistory();
+}
+
+function histData(){
+  // Más nueva primero; idx = posición real en el storage (para borrar).
+  const snaps = (loadHist()[CURRENT_COUNTRY] || []).map((s,i)=>({...s, idx:i})).reverse();
+  const labels = new Map();
+  snaps.forEach(s=>(s.consignees[ACTIVE_CONSIGNEE]||[]).forEach(b=>{
+    if(!labels.has(b.label)) labels.set(b.label, {label:b.label, sortKey:b.sortKey, isMonth:b.isMonth});
+  }));
+  const rowsOut = [...labels.values()].sort(bucketCmp);
+  const maps = snaps.map(s=>{
+    const m = new Map();
+    (s.consignees[ACTIVE_CONSIGNEE]||[]).forEach(b=>m.set(b.label,b));
+    return m;
+  });
+  const totals = snaps.map(s=>{
+    const t = {fob:0,fobAduana:0,presupuesto:0,has:!!s.consignees[ACTIVE_CONSIGNEE]};
+    (s.consignees[ACTIVE_CONSIGNEE]||[]).forEach(b=>{ t.fob+=b.fob; t.fobAduana+=b.fobAduana; t.presupuesto+=b.presupuesto; });
+    return t;
+  });
+  return {snaps, rowsOut, maps, totals};
+}
+
+function renderHistory(){
+  if(!CURRENT_COUNTRY) return;
+  const country = currentCountry();
+  const {snaps, rowsOut, maps, totals} = histData();
+  const head = document.getElementById('histHead');
+  const body = document.getElementById('histBody');
+  const foot = document.getElementById('histFoot');
+  document.getElementById('histTitle').textContent = 'Historial '+country.name+' — '+(ACTIVE_CONSIGNEE||'—');
+
+  const last = lastAutoDate(CURRENT_COUNTRY);
+  const next = last ? new Date(startOfDay(last).getTime()+AUTO_DAYS*DAY_MS) : null;
+  document.getElementById('histNote').textContent = snaps.length+' foto(s) guardada(s)'+(next ? ' · Próxima foto automática: '+fmtDate(next) : '');
+
+  const empty = !snaps.length;
+  document.getElementById('histEmpty').style.display = empty ? 'block' : 'none';
+  head.innerHTML = ''; body.innerHTML = ''; foot.innerHTML = '';
+  if(empty) return;
+
+  let h1 = '<tr><th rowspan="2">Mes de pago</th>';
+  let h2 = '<tr>';
+  snaps.forEach(s=>{
+    const d = new Date(s.savedAt);
+    h1 += '<th colspan="3" class="grp"><span class="snap-date">Guardado '+fmtDateTime(d)+'</span>'
+       + '<span class="snap-type '+s.type+'">'+(s.type==='auto'?'AUTO':'MANUAL')+'</span>'
+       + '<button type="button" class="snap-del" title="Borrar esta foto" data-idx="'+s.idx+'">&times;</button></th>';
+    h2 += '<th class="grp">FOB Supplier</th><th>FOB Aduana</th><th>Presupuesto Aduana</th>';
+  });
+  head.innerHTML = h1+'</tr>'+h2+'</tr>';
+  head.querySelectorAll('.snap-del').forEach(b=>b.onclick=()=>deleteSnapshot(+b.dataset.idx));
+
+  let bh = '';
+  rowsOut.forEach(r=>{
+    bh += '<tr><td>'+escHtml(r.label)+'</td>';
+    maps.forEach(m=>{
+      const b = m.get(r.label);
+      if(b) bh += '<td class="grp">'+fmtUsd(b.fob)+'</td><td>'+fmtUsd(b.fobAduana)+'</td><td>'+fmtUsd(b.presupuesto)+'</td>';
+      else bh += '<td class="grp na">—</td><td class="na">—</td><td class="na">—</td>';
+    });
+    bh += '</tr>';
+  });
+  body.innerHTML = bh;
+
+  let fh = '<tr><td>Total '+escHtml(ACTIVE_CONSIGNEE||'')+'</td>';
+  totals.forEach(t=>{
+    if(t.has) fh += '<td class="grp">'+fmtUsd(t.fob)+'</td><td>'+fmtUsd(t.fobAduana)+'</td><td>'+fmtUsd(t.presupuesto)+'</td>';
+    else fh += '<td class="grp na">—</td><td class="na">—</td><td class="na">—</td>';
+  });
+  foot.innerHTML = fh+'</tr>';
+}
+
+function exportHistoryToExcel(){
+  const country = currentCountry();
+  const {snaps, rowsOut, maps, totals} = histData();
+  if(!snaps.length){ alert('No hay fotos guardadas para exportar.'); return; }
+  let html = '<table border="1"><thead><tr><th rowspan="2">Mes de pago</th>';
+  snaps.forEach(s=>{ html += '<th colspan="3">Guardado '+escHtml(fmtDateTime(new Date(s.savedAt)))+' ('+(s.type==='auto'?'auto':'manual')+')</th>'; });
+  html += '</tr><tr>';
+  snaps.forEach(()=>{ html += '<th>Suma de FOB Supplier</th><th>Suma de FOB Aduana</th><th>Suma de Presupuesto Aduana</th>'; });
+  html += '</tr></thead><tbody>';
+  rowsOut.forEach(r=>{
+    html += '<tr><td>'+escHtml(r.label)+'</td>';
+    maps.forEach(m=>{ const b = m.get(r.label); html += b ? '<td>'+b.fob+'</td><td>'+b.fobAduana+'</td><td>'+b.presupuesto+'</td>' : '<td></td><td></td><td></td>'; });
+    html += '</tr>';
+  });
+  html += '<tr><td><b>Total '+escHtml(ACTIVE_CONSIGNEE||'')+'</b></td>';
+  totals.forEach(t=>{ html += t.has ? '<td><b>'+t.fob+'</b></td><td><b>'+t.fobAduana+'</b></td><td><b>'+t.presupuesto+'</b></td>' : '<td></td><td></td><td></td>'; });
+  html += '</tr></tbody></table>';
+  const ts = new Date();
+  downloadXls(html, 'Cashflow_Aduana_Historial_'+country.code+'_'+(ACTIVE_CONSIGNEE||'')+'_'+ts.getFullYear()+String(ts.getMonth()+1).padStart(2,'0')+String(ts.getDate()).padStart(2,'0')+'.xls');
+}
+function downloadXls(html, filename){
+  const blob = new Blob(['﻿<html><head><meta charset="UTF-8"></head><body>'+html+'</body></html>'], {type:'application/vnd.ms-excel'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function setView(v){
+  ACTIVE_VIEW = v;
+  document.getElementById('viewTabActual').classList.toggle('active', v==='actual');
+  document.getElementById('viewTabHist').classList.toggle('active', v==='hist');
+  document.getElementById('viewActual').style.display = v==='actual' ? 'block' : 'none';
+  document.getElementById('viewHist').style.display = v==='hist' ? 'block' : 'none';
+  if(v==='hist') renderHistory();
+}
+
+function escHtml(s){
+  return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+function exportToExcel(){
+  const country = currentCountry();
+  const rows = ROWS.filter(r=>r.consignee===ACTIVE_CONSIGNEE);
+  const buckets = buildBuckets(rows);
+
+  let totalFob=0, totalFobAduana=0, totalPresupuesto=0;
+  let html = '<table border="1"><thead><tr><th>Mes de pago</th><th>Suma de FOB Supplier</th><th>Suma de FOB Aduana</th><th>Suma de Presupuesto Aduana</th></tr></thead><tbody>';
+  buckets.forEach(b=>{
+    totalFob += b.fob; totalFobAduana += b.fobAduana; totalPresupuesto += b.presupuesto;
+    html += '<tr><td>'+escHtml(b.label)+'</td><td>'+Math.round(b.fob)+'</td><td>'+Math.round(b.fobAduana)+'</td><td>'+Math.round(b.presupuesto)+'</td></tr>';
+  });
+  html += '<tr><td><b>Total '+escHtml(ACTIVE_CONSIGNEE||'')+'</b></td><td><b>'+Math.round(totalFob)+'</b></td><td><b>'+Math.round(totalFobAduana)+'</b></td><td><b>'+Math.round(totalPresupuesto)+'</b></td></tr>';
+  html += '</tbody></table>';
+
+  const blob = new Blob(['﻿<html><head><meta charset="UTF-8"></head><body>'+html+'</body></html>'], {type:'application/vnd.ms-excel'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date();
+  a.href = url;
+  a.download = 'Cashflow_Aduana_'+(country?country.code:'')+'_'+(ACTIVE_CONSIGNEE||'')+'_'+ts.getFullYear()+String(ts.getMonth()+1).padStart(2,'0')+String(ts.getDate()).padStart(2,'0')+'.xls';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function renderConsigTabs(){
+  const bar = document.getElementById('consigTabs');
+  if(CONSIGNEES.length <= 1){ bar.style.display = 'none'; bar.innerHTML=''; return; }
+  bar.innerHTML = '';
+  bar.style.display = 'flex';
+  CONSIGNEES.forEach(name=>{
+    const tab = document.createElement('button');
+    tab.type = 'button';
+    tab.className = 'consig-tab' + (name===ACTIVE_CONSIGNEE ? ' active' : '');
+    tab.textContent = name;
+    tab.onclick = ()=>{ ACTIVE_CONSIGNEE = name; renderConsigTabs(); renderTable(); renderHistory(); };
+    bar.appendChild(tab);
+  });
+}
+
+function renderTable(){
+  const body = document.getElementById('cfBody');
+  body.innerHTML = '';
+  const rows = ROWS.filter(r=>r.consignee===ACTIVE_CONSIGNEE);
+  const buckets = buildBuckets(rows);
+
+  let totalFob=0, totalFobAduana=0, totalPresupuesto=0;
+  buckets.forEach(b=>{
+    totalFob += b.fob; totalFobAduana += b.fobAduana; totalPresupuesto += b.presupuesto;
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+b.label+'</td><td>'+fmtUsd(b.fob)+'</td><td>'+fmtUsd(b.fobAduana)+'</td><td>'+fmtUsd(b.presupuesto)+'</td>';
+    body.appendChild(tr);
+  });
+
+  document.getElementById('tcTitle').textContent = 'Cashflow Aduana por mes de pago — '+(ACTIVE_CONSIGNEE||'—');
+  document.getElementById('cfTotalLabel').textContent = 'Total '+(ACTIVE_CONSIGNEE||'');
+  document.getElementById('cfTotalFob').textContent = fmtUsd(totalFob);
+  document.getElementById('cfTotalFobAduana').textContent = fmtUsd(totalFobAduana);
+  document.getElementById('cfTotalPresupuesto').textContent = fmtUsd(totalPresupuesto);
+  document.getElementById('tcNote').textContent = rows.length+' filas con pago de aduana confirmado';
+}
+
+function renderAll(){
+  CONSIGNEES = [...new Set(ROWS.map(r=>r.consignee))].sort((a,b)=>a.localeCompare(b,'es'));
+  if(!ACTIVE_CONSIGNEE || !CONSIGNEES.includes(ACTIVE_CONSIGNEE)) ACTIVE_CONSIGNEE = CONSIGNEES[0] || null;
+  renderConsigTabs();
+  renderTable();
+  renderHistory();
+}
+
+function showDashboard(){
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('comingSoon').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+}
+
+function loadIntoState(rows, meta){
+  ROWS = rows;
+  META = meta;
+  renderAll();
+  const d = meta.loadedAt;
+  const ts = d.toLocaleDateString('es-AR')+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('loadStatus').textContent = ts;
+  const country = currentCountry();
+  document.getElementById('footNote').textContent = 'Fuente: hoja de '+country.name+' · '+meta.usedRows+' de '+meta.totalSheetRows+' filas totales (excluye CANCELADO, filas sin pago de aduana cargado y meses anteriores a enero 2026) · Ultima carga: '+ts;
+  showDashboard();
+}
+
+function persist(){
+  if(!CURRENT_COUNTRY) return;
+  try{
+    localStorage.setItem(lsKey(CURRENT_COUNTRY), JSON.stringify({rows:ROWS, meta:{...META, loadedAt:META.loadedAt.toISOString()}}));
+  }catch(e){ console.warn('No se pudo guardar cache local', e); }
+}
+function tryRestore(){
+  if(!CURRENT_COUNTRY) return false;
+  try{
+    const raw = localStorage.getItem(lsKey(CURRENT_COUNTRY));
+    if(!raw) return false;
+    const parsed = JSON.parse(raw);
+    parsed.meta.loadedAt = new Date(parsed.meta.loadedAt);
+    loadIntoState(parsed.rows, parsed.meta);
+    return true;
+  }catch(e){ console.warn('No se pudo restaurar cache local', e); return false; }
+}
+
+function showUpdateWarning(){
+  const d = META && META.loadedAt;
+  const ts = d ? (d.toLocaleDateString('es-AR')+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})) : 'desconocida';
+  document.getElementById('updateWarningText').textContent = 'No se pudo actualizar en este momento. Mostrando datos de las '+ts+'.';
+  document.getElementById('updateWarning').style.display = 'flex';
+}
+function hideUpdateWarning(){
+  document.getElementById('updateWarning').style.display = 'none';
+}
+document.getElementById('updateWarningClose').onclick = hideUpdateWarning;
+
+async function fetchCountryData(country){
+  const sheetParam = country.sheetGid ? ('gid='+country.sheetGid) : ('sheet='+encodeURIComponent(country.sheetName));
+  const base = 'https://docs.google.com/spreadsheets/d/'+country.sheetId+'/gviz/tq?tqx=out:json&'+sheetParam;
+  const ts = Date.now();
+  const headerData = await loadGvizJsonp(base+'&range=A2:ZZ2&_='+ts);
+  const bodyData = await loadGvizJsonp(base+'&range=A3:ZZ200000&_='+(ts+1));
+  return parseGvizTable(headerData.table, bodyData.table, country);
+}
+
+async function fetchFromGoogleSheets(opts){
+  const country = currentCountry();
+  if(!country) return;
+  const silent = opts && opts.silent;
+  const btn = document.getElementById('btnLoad');
+  const prevLabel = btn.textContent;
+  if(!silent){ btn.disabled = true; btn.textContent = 'Actualizando...'; }
+  try{
+    const {rows, meta} = await fetchCountryData(country);
+    maybeAutoSnapshot(country.code, rows);
+    if(CURRENT_COUNTRY !== country.code) return; // el usuario cambió de país mientras cargaba
+    loadIntoState(rows, meta);
+    persist();
+    hideUpdateWarning();
+  }catch(err){
+    if(CURRENT_COUNTRY !== country.code) return;
+    if(ROWS.length){
+      showUpdateWarning();
+    } else if(tryRestore()){
+      showUpdateWarning();
+    } else {
+      document.getElementById('emptyStateMsg').textContent = 'No se pudo cargar desde Google Sheets: '+err.message;
+      document.getElementById('emptyState').style.display = 'block';
+    }
+  } finally {
+    if(!silent){ btn.disabled = false; btn.textContent = prevLabel; }
+  }
+}
+
+function renderCountryTabs(){
+  const bar = document.getElementById('countryTabs');
+  bar.innerHTML = '';
+  COUNTRIES.forEach(c=>{
+    const tab = document.createElement('button');
+    tab.type = 'button';
+    tab.className = 'country-tab' + (c.code===CURRENT_COUNTRY ? ' active' : '');
+    tab.textContent = c.name;
+    tab.onclick = ()=>selectCountry(c);
+    bar.appendChild(tab);
+  });
+}
+
+function selectCountry(country){
+  CURRENT_COUNTRY = country.code;
+  ROWS = []; META = null; CONSIGNEES = []; ACTIVE_CONSIGNEE = null;
+  renderCountryTabs();
+  hideUpdateWarning();
+  document.getElementById('consigTabs').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('comingSoon').style.display = 'none';
+  document.getElementById('emptyStateMsg').textContent = 'Cargando datos desde Google Sheets...';
+  document.getElementById('emptyState').style.display = 'block';
+  return fetchFromGoogleSheets({silent:true});
+}
+
+document.getElementById('btnLoad').onclick = ()=>fetchFromGoogleSheets({});
+document.getElementById('btnLoadEmpty').onclick = ()=>fetchFromGoogleSheets({});
+document.getElementById('btnExport').onclick = ()=>exportToExcel();
+document.getElementById('viewTabActual').onclick = ()=>setView('actual');
+document.getElementById('viewTabHist').onclick = ()=>setView('hist');
+document.getElementById('btnSnapNow').onclick = ()=>saveManualSnapshot();
+document.getElementById('btnExportHist').onclick = ()=>exportHistoryToExcel();
+
+setInterval(async ()=>{ await fetchFromGoogleSheets({silent:true}); runAutoSnapshots(); }, 30*60*1000);
+
+(async ()=>{
+  await selectCountry(COUNTRIES[0]);
+  runAutoSnapshots(); // foto automática de los demás países si corresponde
+})();
+</script>
+</body>
+</html>
