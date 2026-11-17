@@ -62,6 +62,8 @@
   .consig-tab.active{color:#fff; background:var(--brand-navy); border-color:var(--brand-navy);}
 
   main{max-width:1100px; margin:0 auto; padding:18px 24px 60px;}
+  /* Detalle productos e Historial usan todo el ancho de la pantalla */
+  body.wide main, body.wide footer.foot{max-width:none;}
 
   .update-warning{
     margin:0 auto 14px; background:#fdf3e0; border:1px solid #eda100;
@@ -99,11 +101,52 @@
   table.hist tfoot td:first-child{background:#f6f3e8;}
   table.hist .snap-date{font-size:13px; color:var(--brand-navy);}
   table.hist .snap-type{display:inline-block; font-size:10.5px; font-weight:700; border-radius:4px; padding:1px 6px; margin-left:6px; vertical-align:1px;}
-  table.hist .snap-type.auto{background:#e3ecf8; color:var(--brand-navy);}
-  table.hist .snap-type.manual{background:#fdf3e0; color:#7a5400;}
-  table.hist .snap-del{background:none; border:none; color:var(--muted); font-size:15px; cursor:pointer; margin-left:4px; padding:0 2px;}
-  table.hist .snap-del:hover{color:#b3261e;}
-  table.hist td.na{color:var(--muted); text-align:center;}
+  table.hist .snap-type.publicada{background:#e3ecf8; color:var(--brand-navy);}
+  table.hist .snap-type.borrador{background:#fdf3e0; color:#7a5400;}
+  table.hist thead th.draft{background:#fdf6e7;}
+  table.hist .snap-actions{display:block; margin-top:5px;}
+  table.hist .snap-btn{font-size:11.5px; font-weight:700; border-radius:5px; padding:3px 10px; cursor:pointer; margin:0 2px;}
+  table.hist .snap-btn.pub{background:var(--brand-navy); color:#fff; border:1px solid var(--brand-navy);}
+  table.hist .snap-btn.del{background:#fff; color:#b3261e; border:1px solid #e3b4b0;}
+  table.hist .snap-btn:disabled{opacity:.5; cursor:default;}
+
+  .det-filters{align-items:center; font-size:13px; color:var(--text-secondary);}
+  .det-filters select{padding:7px 10px; font-size:13px; border:1px solid var(--border); border-radius:7px; background:#fff; color:var(--text-primary);}
+  #viewDet .tablewrap{max-height:72vh;}
+  table.det th, table.det td{padding:8px 9px;}
+  table.det thead th{white-space:normal; vertical-align:bottom;}
+  table.det th.txt, table.det td.txt{text-align:left;}
+  table.det td.txt{white-space:normal; overflow-wrap:anywhere; min-width:100px; max-width:320px;}
+  table.det td.code{font-size:12px; min-width:110px; overflow-wrap:normal;}
+  table.det td.bl{white-space:nowrap;}
+  table.det td.txt:first-child{min-width:170px;}
+  table.det td.estado{font-size:12px;}
+  table.det th.dt, table.det td.dt{text-align:center;}
+  table.det tr.det-month td{background:#e3ecf8 !important; color:var(--brand-navy); font-weight:700; text-align:left;}
+  table.det tr.det-sub td{background:#f6f3e8 !important; color:var(--brand-navy); font-weight:700;}
+  table.det td.det-empty{text-align:center; color:var(--muted); padding:30px;}
+  .est-cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; padding:2px 18px 14px;}
+  .est-card{background:#fff; border:1px solid var(--border); border-left:4px solid var(--brand-navy); border-radius:9px; padding:10px 12px;
+    display:block; width:100%; text-align:left; font:inherit; color:inherit; cursor:pointer;}
+  .est-card:hover{border-color:var(--brand-navy);}
+  .est-card.total{border-left-color:#eda100; background:#f6f3e8;}
+  .est-card.active{background:#e3ecf8; border-color:var(--brand-navy); box-shadow:0 0 0 1px var(--brand-navy);}
+  .est-card .est-name{font-size:12px; font-weight:700; color:var(--brand-navy); letter-spacing:.3px; display:flex; justify-content:space-between; gap:6px;}
+  .est-card .est-lines{font-size:11px; color:var(--muted); font-weight:500; white-space:nowrap;}
+  .est-card .est-row{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12px; color:var(--text-secondary); margin-top:6px;}
+  .est-card .est-row b{color:var(--text-primary); font-size:14px; white-space:nowrap;}
+  table.cf tbody tr.clickable{cursor:pointer;}
+  table.cf tbody tr.clickable:hover td{background:#eef2f8;}
+
+  .modal-bg{position:fixed; inset:0; background:rgba(11,11,11,.45); display:flex; align-items:center; justify-content:center; z-index:50; padding:16px;}
+  .modal{background:#fff; border-radius:12px; padding:20px 22px; width:100%; max-width:380px; box-shadow:0 10px 30px rgba(0,0,0,.25);}
+  .modal h3{margin:0 0 8px; font-size:16px; color:var(--brand-navy);}
+  .modal p{margin:0 0 12px; font-size:13px; color:var(--text-secondary);}
+  .modal input{width:100%; padding:9px 10px; font-size:14px; border:1px solid var(--border); border-radius:7px;}
+  .modal .modal-err{color:#b3261e; font-size:12.5px; margin-top:8px; min-height:1em;}
+  .modal .modal-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:14px;}
+  .modal .btn{border:1px solid var(--border);}
+  .modal .btn.primary{background:var(--brand-navy); color:#fff; border-color:var(--brand-navy);}
 
   .empty-state{padding:60px 20px; text-align:center; color:var(--muted);}
   .empty-state .btn{margin-top:14px;}
@@ -160,7 +203,42 @@
   <div id="dashboard" style="display:none;">
     <div class="view-tabs">
       <button type="button" class="view-tab active" id="viewTabActual">Cuadro actual</button>
+      <button type="button" class="view-tab" id="viewTabDet">Detalle productos</button>
       <button type="button" class="view-tab" id="viewTabHist">Historial</button>
+    </div>
+
+    <div class="tablecard" id="viewDet" style="display:none;">
+      <div class="tc-head">
+        <h2 id="detTitle">Detalle productos</h2>
+        <span class="tc-note" id="detNote"></span>
+        <div class="tc-actions det-filters">
+          <label for="detMes">Mes de pago</label>
+          <select id="detMes"></select>
+          <button type="button" class="btn" id="btnExportDet" style="background:var(--brand-navy); color:#fff;">Exportar a Excel</button>
+        </div>
+      </div>
+      <div class="est-cards" id="detCards"></div>
+      <div class="tablewrap">
+        <table class="cf det">
+          <thead>
+            <tr>
+              <th class="txt">Producto</th>
+              <th class="txt">Modelo</th>
+              <th class="txt">Contenedor</th>
+              <th class="txt">BL</th>
+              <th>Cantidad</th>
+              <th>FOB Supplier</th>
+              <th>FOB Aduana</th>
+              <th>Presupuesto Aduana</th>
+              <th class="txt">Estado</th>
+              <th class="dt">ETD</th>
+              <th class="dt">ETA</th>
+            </tr>
+          </thead>
+          <tbody id="detBody"></tbody>
+          <tfoot id="detFoot"></tfoot>
+        </table>
+      </div>
     </div>
 
     <div class="tablecard" id="viewHist" style="display:none;">
@@ -168,7 +246,7 @@
         <h2 id="histTitle">Historial</h2>
         <span class="tc-note" id="histNote"></span>
         <div class="tc-actions">
-          <button type="button" class="btn" id="btnSnapNow" style="background:var(--brand-navy); color:#fff;">Guardar foto ahora</button>
+          <button type="button" class="btn" id="btnSnapNow" style="background:var(--brand-navy); color:#fff;">Guardar borrador</button>
           <button type="button" class="btn" id="btnExportHist" style="border:1px solid var(--brand-navy);">Exportar historial a Excel</button>
         </div>
       </div>
@@ -215,6 +293,19 @@
 
 <footer class="foot" id="footNote"></footer>
 
+<div class="modal-bg" id="claveModal" style="display:none;">
+  <form class="modal" id="claveForm" autocomplete="off">
+    <h3>Publicar foto</h3>
+    <p id="claveMsg"></p>
+    <input type="password" id="claveInput" placeholder="Clave de publicación">
+    <div class="modal-err" id="claveErr"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn" id="claveCancel">Cancelar</button>
+      <button type="submit" class="btn primary" id="claveOk">Publicar</button>
+    </div>
+  </form>
+</div>
+
 <script>
 const COUNTRIES = [
   {code:'AR', name:'Argentina', sheetId:'1Uv_dFJEiyKUqN5J38mgrHAWF8M3j_RJYBWHvr8z5Np4', sheetName:'STATUS COMEX', fobAduanaCol:'FOB ADUANA', presupuestoCol:'PRESUPUESTO ADUANA', pagoAduanaCol:'PAGO ADUANA'},
@@ -223,6 +314,8 @@ const COUNTRIES = [
   {code:'CO', name:'Colombia', sheetId:'1QyQK6_9itUUqoghg7DvqHnPT3SpILlNaolSHzQO8f0o', sheetGid:'0', fobAduanaCol:'FOB ADUANA', presupuestoCol:'PRESUPUESTO ADUANA', pagoAduanaCol:'PAGO ADUANA'}
 ];
 const EXCLUDE_PRODUCT_TOKENS = ['CAJAS VACIAS','REPUESTOS','MUESTRAS'];
+// Valores de "mes de pago" que nunca se muestran (ni cuadro actual ni historial).
+const EXCLUDE_PAGO_LABELS = ['CANCELADO','COURIER'];
 const MES_ORDER = {ENERO:1,FEBRERO:2,MARZO:3,ABRIL:4,MAYO:5,JUNIO:6,JULIO:7,AGOSTO:8,SEPTIEMBRE:9,OCTUBRE:10,NOVIEMBRE:11,DICIEMBRE:12};
 const MIN_PAGO_SORT_KEY = 2026*100+1;
 
@@ -233,7 +326,7 @@ let CONSIGNEES = [];
 let ACTIVE_CONSIGNEE = null;
 
 function currentCountry(){ return COUNTRIES.find(c=>c.code===CURRENT_COUNTRY); }
-function lsKey(code){ return 'cashflow_aduana_data_v1_'+code; }
+function lsKey(code){ return 'cashflow_aduana_data_v3_'+code; }
 
 function fmtUsd(n){
   return 'USD '+Math.round(n).toLocaleString('es-AR');
@@ -242,7 +335,7 @@ function fmtUsd(n){
 function parsePagoAduana(raw){
   const v = (raw||'').trim();
   if(!v) return null;
-  if(v.toUpperCase()==='CANCELADO') return null;
+  if(EXCLUDE_PAGO_LABELS.includes(v.toUpperCase())) return null;
   const m = v.match(/^([A-ZÁÉÍÓÚ]+)\.(\d{4})$/);
   if(m && MES_ORDER[m[1]]){
     const year = +m[2];
@@ -288,6 +381,19 @@ function num(v){
 function txt(v, fallback){
   return (typeof v==='string' && v.trim()!=='') ? v.trim() : fallback;
 }
+function str(v){ return v==null ? '' : String(v).trim(); }
+// Fecha GViz "Date(2026,5,16)" -> "2026-06-16". Texto suelto se deja tal cual. Años < 2000 = vacío.
+function parseSheetDate(v){
+  if(typeof v!=='string') return '';
+  const m = v.match(/^Date\((\d+),(\d+),(\d+)/);
+  if(!m) return v.trim();
+  if(+m[1] < 2000) return '';
+  return m[1]+'-'+String(+m[2]+1).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0');
+}
+function fmtSheetDate(s){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s||'');
+  return m ? m[3]+'/'+m[2]+'/'+m[1] : (s||'');
+}
 
 function parseGvizTable(headerTable, dataTable, country){
   const nCols = dataTable.cols.length;
@@ -325,6 +431,13 @@ function parseGvizTable(headerTable, dataTable, country){
     rows.push({
       consignee,
       estado,
+      producto,
+      modelo: str(get('MODELO')),
+      contenedor: str(get('NRO CONTENEDOR')),
+      bl: str(get('BL')),
+      cantidad: num(get('CANTIDAD')),
+      etd: parseSheetDate(get('ETD')),
+      eta: parseSheetDate(get('ETA')),
       fob: num(get('FOB SUPPLIER')),
       fobAduana: num(get(country.fobAduanaCol)),
       presupuesto: num(get(country.presupuestoCol)),
@@ -353,23 +466,33 @@ function bucketCmp(a,b){
 }
 
 /* ===================== HISTORIAL ===================== */
+// Historial compartido: Google Sheet + Apps Script (app web). Completar con los datos reales.
+const HIST_SHEET_ID   = '1R3ScqJd1nZhT7SsDXriM_XSQ-lJDl6jR5jmQtQfldh0';          // ID del Sheet "HISTORIAL CASHFLOW ADUANA"
+const HIST_SHEET_NAME = 'HISTORIAL';   // pestaña donde el script guarda las fotos
+const HIST_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxjj2VhO8r_wIfOmhDrf2zN8NgLiQoGesvlILVVWu0Cw61V-0X3RKHZZ4mzi42IBcYL1w/exec';          // URL de la app web de Apps Script (termina en /exec)
+
+// Borradores: viven solo en este navegador hasta que se publican.
+// Cada consignee tiene su propio historial: guardar, publicar y borrar actúan solo sobre el consignee activo.
 const HIST_KEY = 'cashflow_aduana_hist_v1';
-const AUTO_DAYS = 15;
-const DAY_MS = 86400000;
 let ACTIVE_VIEW = 'actual';
+let PUBLISHED = [];               // fotos publicadas (todos los países), leídas del Sheet
+let PUBLISHED_STATUS = 'idle';    // idle | loading | ok | error | noconfig
+let PUBLISHING = false;
 
 function loadHist(){
   try{ return JSON.parse(localStorage.getItem(HIST_KEY)) || {}; }catch(e){ return {}; }
 }
 function saveHist(h){
   try{ localStorage.setItem(HIST_KEY, JSON.stringify(h)); return true; }
-  catch(e){ console.warn('No se pudo guardar historial', e); alert('No se pudo guardar el historial en este navegador.'); return false; }
+  catch(e){ console.warn('No se pudo guardar borradores', e); alert('No se pudo guardar el borrador en este navegador.'); return false; }
 }
-function startOfDay(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
-function fmtDate(d){ return d.toLocaleDateString('es-AR'); }
 function fmtDateTime(d){ return d.toLocaleDateString('es-AR')+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); }
+function snapId(code, savedAt){ return code+'|'+savedAt; }
+function cleanBuckets(list){
+  return (list||[]).filter(b=>!EXCLUDE_PAGO_LABELS.includes(String(b.label).trim().toUpperCase()));
+}
 
-function buildSnapshot(rows, type){
+function buildSnapshot(rows){
   const consignees = {};
   [...new Set(rows.map(r=>r.consignee))].forEach(c=>{
     consignees[c] = buildBuckets(rows.filter(r=>r.consignee===c)).map(b=>({
@@ -377,69 +500,178 @@ function buildSnapshot(rows, type){
       fob:Math.round(b.fob), fobAduana:Math.round(b.fobAduana), presupuesto:Math.round(b.presupuesto)
     }));
   });
-  return {savedAt:new Date().toISOString(), type, consignees};
+  return {savedAt:new Date().toISOString(), consignees};
 }
-function addSnapshot(code, rows, type){
-  if(!rows || !rows.length) return false;
+
+// Guarda borrador SOLO del consignee activo.
+function saveDraft(){
+  const cons = ACTIVE_CONSIGNEE;
+  const rows = ROWS.filter(r=>r.consignee===cons);
+  if(!cons || !rows.length){ alert('No hay datos cargados para guardar.'); return; }
   const h = loadHist();
-  (h[code] = h[code] || []).push(buildSnapshot(rows, type));
+  (h[CURRENT_COUNTRY] = h[CURRENT_COUNTRY] || []).push(buildSnapshot(rows));
+  if(saveHist(h)) renderHistory();
+}
+function findDraft(code, id){
+  return (loadHist()[code] || []).find(s=>snapId(code, s.savedAt)===id) || null;
+}
+// Saca un consignee de un borrador; si no queda ninguno, el borrador desaparece.
+function removeDraftConsignee(code, id, cons){
+  const h = loadHist();
+  const list = h[code] || [];
+  const s = list.find(x=>snapId(code, x.savedAt)===id);
+  if(!s || !s.consignees || !(cons in s.consignees)) return true;
+  delete s.consignees[cons];
+  h[code] = list.filter(x=>x.consignees && Object.keys(x.consignees).length);
   return saveHist(h);
 }
-function lastAutoDate(code){
-  const autos = (loadHist()[code] || []).filter(s=>s.type==='auto');
-  return autos.length ? new Date(autos[autos.length-1].savedAt) : null;
+function deleteDraft(id){
+  const s = findDraft(CURRENT_COUNTRY, id);
+  if(!s) return;
+  if(!confirm('¿Borrar el borrador de '+ACTIVE_CONSIGNEE+' del '+fmtDateTime(new Date(s.savedAt))+'?\nEs solo de esta compu, no toca el historial publicado ni otros consignees.')) return;
+  if(removeDraftConsignee(CURRENT_COUNTRY, id, ACTIVE_CONSIGNEE)) renderHistory();
 }
-// Cadencia fija de 15 días contada desde la última foto automática (las manuales no la corren).
-function isAutoDue(code){
-  const last = lastAutoDate(code);
-  if(!last) return true;
-  return Math.round((startOfDay(new Date()) - startOfDay(last))/DAY_MS) >= AUTO_DAYS;
+function isPublished(code, savedAt, cons){
+  return PUBLISHED.some(p=>p.code===code && p.savedAt===savedAt && p.consignees[cons]);
 }
-function maybeAutoSnapshot(code, rows){
-  if(isAutoDue(code) && addSnapshot(code, rows, 'auto') && code===CURRENT_COUNTRY) renderHistory();
+
+// Lee todas las fotos publicadas del Sheet (lectura pública vía GViz).
+async function loadPublished(){
+  if(!HIST_SHEET_ID){ PUBLISHED_STATUS = 'noconfig'; if(CURRENT_COUNTRY) renderHistory(); return; }
+  PUBLISHED_STATUS = 'loading';
+  if(CURRENT_COUNTRY) renderHistory();
+  try{
+    const url = 'https://docs.google.com/spreadsheets/d/'+HIST_SHEET_ID+'/gviz/tq?tqx=out:json&headers=0'
+      + '&sheet='+encodeURIComponent(HIST_SHEET_NAME)+'&range=A2:J200000&_='+Date.now();
+    const data = await loadGvizJsonp(url);
+    // ID FOTO = PAIS|savedAt (fotos viejas) o PAIS|savedAt|CONSIGNEE. Se agrupa por PAIS|savedAt.
+    const byId = new Map();
+    (data.table.rows || []).forEach(row=>{
+      const c = (row.c || []).map(x=>(x && x.v!==undefined) ? x.v : null);
+      const parts = typeof c[0]==='string' ? c[0].split('|') : [];
+      if(parts.length < 2) return;
+      const id = snapId(parts[0], parts[1]);
+      if(!byId.has(id)) byId.set(id, {id, code:parts[0], savedAt:parts[1], type:'publicada', consignees:{}});
+      const s = byId.get(id);
+      const cons = c[3]==null ? '' : String(c[3]);
+      (s.consignees[cons] = s.consignees[cons] || []).push({
+        label: c[4]==null ? '' : String(c[4]),
+        sortKey: typeof c[5]==='number' ? c[5] : null,
+        isMonth: c[6]===true || String(c[6]).toUpperCase()==='TRUE',
+        fob: num(c[7]), fobAduana: num(c[8]), presupuesto: num(c[9])
+      });
+    });
+    PUBLISHED = [...byId.values()];
+    PUBLISHED_STATUS = 'ok';
+    // Si un consignee de un borrador ya figura publicado (p. ej. se cortó antes de borrarlo), se limpia.
+    const h = loadHist(); let changed = false;
+    Object.keys(h).forEach(code=>{
+      (h[code] || []).forEach(s=>{
+        const pub = byId.get(snapId(code, s.savedAt));
+        if(!pub || !s.consignees) return;
+        Object.keys(s.consignees).forEach(cons=>{ if(pub.consignees[cons]){ delete s.consignees[cons]; changed = true; } });
+      });
+      h[code] = (h[code] || []).filter(s=>s.consignees && Object.keys(s.consignees).length);
+    });
+    if(changed) saveHist(h);
+  }catch(e){
+    console.warn('No se pudo leer el historial publicado', e);
+    PUBLISHED_STATUS = 'error';
+  }
+  if(CURRENT_COUNTRY) renderHistory();
 }
-async function runAutoSnapshots(){
-  for(const c of COUNTRIES){
-    if(!isAutoDue(c.code)) continue;
-    try{
-      const {rows} = await fetchCountryData(c);
-      maybeAutoSnapshot(c.code, rows);
-    }catch(e){ console.warn('Foto automática falló para '+c.name, e); }
+
+function askClave(s, cons){
+  return new Promise(resolve=>{
+    const modal = document.getElementById('claveModal');
+    const input = document.getElementById('claveInput');
+    const err = document.getElementById('claveErr');
+    document.getElementById('claveMsg').textContent = 'Foto de '+currentCountry().name+' — '+cons+' del '+fmtDateTime(new Date(s.savedAt))
+      + '. Se publica solo '+cons+'. Una vez publicada la ven todos y solo se puede borrar desde el Sheet.';
+    input.value = ''; err.textContent = '';
+    modal.style.display = 'flex';
+    input.focus();
+    const close = (val)=>{ modal.style.display = 'none'; document.getElementById('claveForm').onsubmit = null; document.getElementById('claveCancel').onclick = null; resolve(val); };
+    document.getElementById('claveForm').onsubmit = (ev)=>{ ev.preventDefault(); const v = input.value.trim(); if(!v){ err.textContent = 'Ingresá la clave.'; return; } close(v); };
+    document.getElementById('claveCancel').onclick = ()=>close(null);
+  });
+}
+
+async function postSnapshot(snapshot, clave){
+  try{
+    const r = await fetch(HIST_WEBAPP_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},   // evita preflight CORS
+      body: JSON.stringify({clave, snapshot})
+    });
+    return await r.json();
+  }catch(e){
+    // Si el navegador no deja leer la respuesta, se verifica leyendo el Sheet.
+    console.warn('Respuesta de la app web no legible, verificando en el Sheet', e);
+    for(let i=0; i<3; i++){
+      await new Promise(res=>setTimeout(res, 2500));
+      await loadPublished();
+      if(isPublished(snapshot.country, snapshot.savedAt, Object.keys(snapshot.consignees)[0])) return {ok:true};
+    }
+    return {ok:false, error:'No se pudo confirmar la publicación. Revisá la clave o la conexión y probá de nuevo.'};
   }
 }
 
-function saveManualSnapshot(){
-  if(!ROWS.length){ alert('No hay datos cargados para guardar.'); return; }
-  if(addSnapshot(CURRENT_COUNTRY, ROWS, 'manual')) renderHistory();
+async function publishDraft(id){
+  if(!HIST_SHEET_ID || !HIST_WEBAPP_URL){ alert('Falta configurar el historial compartido (ID del Sheet y URL de la app web).'); return; }
+  if(PUBLISHING) return;
+  const code = CURRENT_COUNTRY;
+  const cons = ACTIVE_CONSIGNEE;
+  const s = findDraft(code, id);
+  if(!s || !s.consignees || !s.consignees[cons]) return;
+  if(isPublished(code, s.savedAt, cons)){ removeDraftConsignee(code, id, cons); renderHistory(); return; }
+  const buckets = cleanBuckets(s.consignees[cons]);
+  if(!buckets.length){ alert('Este borrador no tiene filas para publicar.'); return; }
+
+  const clave = await askClave(s, cons);   // se pide siempre, en cada publicación
+  if(!clave) return;
+
+  PUBLISHING = true; renderHistory();
+  let res;
+  try{ res = await postSnapshot({id:id+'|'+cons, country:code, savedAt:s.savedAt, consignees:{[cons]:buckets}}, clave); }
+  finally{ PUBLISHING = false; }
+  if(res && res.ok){
+    removeDraftConsignee(code, id, cons);
+    await loadPublished();
+  } else {
+    renderHistory();
+    alert('No se publicó: '+((res && res.error) || 'error desconocido'));
+  }
 }
-function deleteSnapshot(idx){
-  const h = loadHist();
-  const list = h[CURRENT_COUNTRY] || [];
-  const s = list[idx];
-  if(!s) return;
-  const country = currentCountry();
-  if(!confirm('¿Borrar la foto del '+fmtDateTime(new Date(s.savedAt))+' de '+country.name+'?\nSe borra para todos los consignees de este país.')) return;
-  list.splice(idx,1);
-  h[CURRENT_COUNTRY] = list;
-  if(saveHist(h)) renderHistory();
+
+// Historial del consignee activo: publicadas (Sheet) + borradores (locales), más nueva primero.
+// Solo aparecen las fotos que tienen ese consignee. Se filtran los labels excluidos también en fotos viejas.
+function consigneeSnaps(){
+  const cons = ACTIVE_CONSIGNEE;
+  const pubs = PUBLISHED.filter(p=>p.code===CURRENT_COUNTRY && p.consignees[cons])
+    .map(p=>({id:p.id, savedAt:p.savedAt, type:'publicada', buckets:cleanBuckets(p.consignees[cons])}));
+  const pubIds = new Set(pubs.map(p=>p.id));
+  const drafts = (loadHist()[CURRENT_COUNTRY] || [])
+    .filter(s=>s.consignees && s.consignees[cons] && !pubIds.has(snapId(CURRENT_COUNTRY, s.savedAt)))
+    .map(s=>({id:snapId(CURRENT_COUNTRY, s.savedAt), savedAt:s.savedAt, type:'borrador', buckets:cleanBuckets(s.consignees[cons])}));
+  return [...pubs, ...drafts].sort((a,b)=>new Date(b.savedAt) - new Date(a.savedAt));
 }
 
 function histData(){
-  // Más nueva primero; idx = posición real en el storage (para borrar).
-  const snaps = (loadHist()[CURRENT_COUNTRY] || []).map((s,i)=>({...s, idx:i})).reverse();
+  const snaps = consigneeSnaps();
   const labels = new Map();
-  snaps.forEach(s=>(s.consignees[ACTIVE_CONSIGNEE]||[]).forEach(b=>{
+  snaps.forEach(s=>s.buckets.forEach(b=>{
     if(!labels.has(b.label)) labels.set(b.label, {label:b.label, sortKey:b.sortKey, isMonth:b.isMonth});
   }));
   const rowsOut = [...labels.values()].sort(bucketCmp);
   const maps = snaps.map(s=>{
     const m = new Map();
-    (s.consignees[ACTIVE_CONSIGNEE]||[]).forEach(b=>m.set(b.label,b));
+    s.buckets.forEach(b=>m.set(b.label,b));
     return m;
   });
   const totals = snaps.map(s=>{
-    const t = {fob:0,fobAduana:0,presupuesto:0,has:!!s.consignees[ACTIVE_CONSIGNEE]};
-    (s.consignees[ACTIVE_CONSIGNEE]||[]).forEach(b=>{ t.fob+=b.fob; t.fobAduana+=b.fobAduana; t.presupuesto+=b.presupuesto; });
+    const t = {fob:0,fobAduana:0,presupuesto:0};
+    s.buckets.forEach(b=>{ t.fob+=b.fob; t.fobAduana+=b.fobAduana; t.presupuesto+=b.presupuesto; });
     return t;
   });
   return {snaps, rowsOut, maps, totals};
@@ -453,35 +685,51 @@ function renderHistory(){
   const body = document.getElementById('histBody');
   const foot = document.getElementById('histFoot');
   document.getElementById('histTitle').textContent = 'Historial '+country.name+' — '+(ACTIVE_CONSIGNEE||'—');
+  document.getElementById('btnSnapNow').textContent = 'Guardar borrador '+(ACTIVE_CONSIGNEE||'');
 
-  const last = lastAutoDate(CURRENT_COUNTRY);
-  const next = last ? new Date(startOfDay(last).getTime()+AUTO_DAYS*DAY_MS) : null;
-  document.getElementById('histNote').textContent = snaps.length+' foto(s) guardada(s)'+(next ? ' · Próxima foto automática: '+fmtDate(next) : '');
+  const nPub = snaps.filter(s=>s.type==='publicada').length;
+  const nDraft = snaps.length - nPub;
+  const statusTxt = {
+    loading: ' · Cargando historial publicado...',
+    error: ' · No se pudo leer el historial publicado (se muestran solo borradores)',
+    noconfig: ' · Historial compartido sin configurar: solo borradores de esta compu'
+  }[PUBLISHED_STATUS] || '';
+  document.getElementById('histNote').textContent = (PUBLISHING ? 'Publicando... · ' : '')
+    + nPub+' publicada(s) · '+nDraft+' borrador(es)'+statusTxt;
 
   const empty = !snaps.length;
   document.getElementById('histEmpty').style.display = empty ? 'block' : 'none';
+  document.getElementById('histEmpty').textContent = 'Todavía no hay fotos guardadas para '+(ACTIVE_CONSIGNEE||'este país')+'.';
   head.innerHTML = ''; body.innerHTML = ''; foot.innerHTML = '';
   if(empty) return;
 
+  const dis = PUBLISHING ? ' disabled' : '';
   let h1 = '<tr><th rowspan="2">Mes de pago</th>';
   let h2 = '<tr>';
   snaps.forEach(s=>{
     const d = new Date(s.savedAt);
-    h1 += '<th colspan="3" class="grp"><span class="snap-date">Guardado '+fmtDateTime(d)+'</span>'
-       + '<span class="snap-type '+s.type+'">'+(s.type==='auto'?'AUTO':'MANUAL')+'</span>'
-       + '<button type="button" class="snap-del" title="Borrar esta foto" data-idx="'+s.idx+'">&times;</button></th>';
-    h2 += '<th class="grp">FOB Supplier</th><th>FOB Aduana</th><th>Presupuesto Aduana</th>';
+    const isDraft = s.type==='borrador';
+    h1 += '<th colspan="3" class="grp'+(isDraft?' draft':'')+'"><span class="snap-date">Guardado '+fmtDateTime(d)+'</span>'
+       + '<span class="snap-type '+s.type+'">'+(isDraft?'BORRADOR':'PUBLICADA')+'</span>'
+       + (isDraft ? '<span class="snap-actions">'
+           + '<button type="button" class="snap-btn pub" data-act="pub" data-id="'+escHtml(s.id)+'"'+dis+'>Publicar</button>'
+           + '<button type="button" class="snap-btn del" data-act="del" data-id="'+escHtml(s.id)+'"'+dis+'>Borrar borrador</button>'
+           + '</span>' : '')
+       + '</th>';
+    h2 += '<th class="grp'+(isDraft?' draft':'')+'">FOB Supplier</th><th'+(isDraft?' class="draft"':'')+'>FOB Aduana</th><th'+(isDraft?' class="draft"':'')+'>Presupuesto Aduana</th>';
   });
   head.innerHTML = h1+'</tr>'+h2+'</tr>';
-  head.querySelectorAll('.snap-del').forEach(b=>b.onclick=()=>deleteSnapshot(+b.dataset.idx));
+  head.querySelectorAll('.snap-btn').forEach(b=>{
+    b.onclick = ()=> b.dataset.act==='pub' ? publishDraft(b.dataset.id) : deleteDraft(b.dataset.id);
+  });
 
   let bh = '';
   rowsOut.forEach(r=>{
     bh += '<tr><td>'+escHtml(r.label)+'</td>';
     maps.forEach(m=>{
       const b = m.get(r.label);
-      if(b) bh += '<td class="grp">'+fmtUsd(b.fob)+'</td><td>'+fmtUsd(b.fobAduana)+'</td><td>'+fmtUsd(b.presupuesto)+'</td>';
-      else bh += '<td class="grp na">—</td><td class="na">—</td><td class="na">—</td>';
+      const v = b || {fob:0, fobAduana:0, presupuesto:0};
+      bh += '<td class="grp">'+fmtUsd(v.fob)+'</td><td>'+fmtUsd(v.fobAduana)+'</td><td>'+fmtUsd(v.presupuesto)+'</td>';
     });
     bh += '</tr>';
   });
@@ -489,8 +737,7 @@ function renderHistory(){
 
   let fh = '<tr><td>Total '+escHtml(ACTIVE_CONSIGNEE||'')+'</td>';
   totals.forEach(t=>{
-    if(t.has) fh += '<td class="grp">'+fmtUsd(t.fob)+'</td><td>'+fmtUsd(t.fobAduana)+'</td><td>'+fmtUsd(t.presupuesto)+'</td>';
-    else fh += '<td class="grp na">—</td><td class="na">—</td><td class="na">—</td>';
+    fh += '<td class="grp">'+fmtUsd(t.fob)+'</td><td>'+fmtUsd(t.fobAduana)+'</td><td>'+fmtUsd(t.presupuesto)+'</td>';
   });
   foot.innerHTML = fh+'</tr>';
 }
@@ -500,17 +747,17 @@ function exportHistoryToExcel(){
   const {snaps, rowsOut, maps, totals} = histData();
   if(!snaps.length){ alert('No hay fotos guardadas para exportar.'); return; }
   let html = '<table border="1"><thead><tr><th rowspan="2">Mes de pago</th>';
-  snaps.forEach(s=>{ html += '<th colspan="3">Guardado '+escHtml(fmtDateTime(new Date(s.savedAt)))+' ('+(s.type==='auto'?'auto':'manual')+')</th>'; });
+  snaps.forEach(s=>{ html += '<th colspan="3">Guardado '+escHtml(fmtDateTime(new Date(s.savedAt)))+' ('+(s.type==='borrador'?'borrador':'publicada')+')</th>'; });
   html += '</tr><tr>';
   snaps.forEach(()=>{ html += '<th>Suma de FOB Supplier</th><th>Suma de FOB Aduana</th><th>Suma de Presupuesto Aduana</th>'; });
   html += '</tr></thead><tbody>';
   rowsOut.forEach(r=>{
     html += '<tr><td>'+escHtml(r.label)+'</td>';
-    maps.forEach(m=>{ const b = m.get(r.label); html += b ? '<td>'+b.fob+'</td><td>'+b.fobAduana+'</td><td>'+b.presupuesto+'</td>' : '<td></td><td></td><td></td>'; });
+    maps.forEach(m=>{ const b = m.get(r.label) || {fob:0, fobAduana:0, presupuesto:0}; html += '<td>'+b.fob+'</td><td>'+b.fobAduana+'</td><td>'+b.presupuesto+'</td>'; });
     html += '</tr>';
   });
   html += '<tr><td><b>Total '+escHtml(ACTIVE_CONSIGNEE||'')+'</b></td>';
-  totals.forEach(t=>{ html += t.has ? '<td><b>'+t.fob+'</b></td><td><b>'+t.fobAduana+'</b></td><td><b>'+t.presupuesto+'</b></td>' : '<td></td><td></td><td></td>'; });
+  totals.forEach(t=>{ html += '<td><b>'+t.fob+'</b></td><td><b>'+t.fobAduana+'</b></td><td><b>'+t.presupuesto+'</b></td>'; });
   html += '</tr></tbody></table>';
   const ts = new Date();
   downloadXls(html, 'Cashflow_Aduana_Historial_'+country.code+'_'+(ACTIVE_CONSIGNEE||'')+'_'+ts.getFullYear()+String(ts.getMonth()+1).padStart(2,'0')+String(ts.getDate()).padStart(2,'0')+'.xls');
@@ -524,13 +771,142 @@ function downloadXls(html, filename){
   URL.revokeObjectURL(url);
 }
 
+/* ===================== DETALLE PRODUCTOS ===================== */
+// Líneas del Sheet del consignee activo, agrupadas por mes de pago aduana (mismas filas que el cuadro actual).
+let DET_MES = '';      // '' = todos los meses
+let DET_ESTADO = '';   // '' = todos los estados (se elige tocando una tarjeta)
+function estadoOf(r){ return r.estado || 'SIN ESTADO'; }
+
+function dateKey(s){ return /^\d{4}-\d{2}-\d{2}$/.test(s||'') ? s : '9999'+(s||''); }
+// Orden: ETA (primero que llega → último), contenedor, BL; vacíos al final. Desempate: producto, modelo.
+function blankLastCmp(x, y){
+  if(!x && !y) return 0; if(!x) return 1; if(!y) return -1;
+  return x.localeCompare(y,'es',{numeric:true});
+}
+function detCmp(a,b){
+  return dateKey(a.eta).localeCompare(dateKey(b.eta))
+    || blankLastCmp(a.contenedor||'', b.contenedor||'')
+    || blankLastCmp(a.bl||'', b.bl||'')
+    || (a.producto||'').localeCompare(b.producto||'','es')
+    || (a.modelo||'').localeCompare(b.modelo||'','es');
+}
+function detBaseRows(){   // consignee + mes (sin filtro de estado): base de las tarjetas
+  return ROWS.filter(r=>r.consignee===ACTIVE_CONSIGNEE && (!DET_MES || r.pagoLabel===DET_MES));
+}
+function detGroups(){
+  const rows = detBaseRows().filter(r=>!DET_ESTADO || estadoOf(r)===DET_ESTADO);
+  return buildBuckets(rows).map(b=>({label:b.label, rows:rows.filter(r=>r.pagoLabel===b.label).sort(detCmp)}));
+}
+function sumRows(rows){
+  const t = {cantidad:0, fob:0, fobAduana:0, presupuesto:0};
+  rows.forEach(r=>{ t.cantidad+=r.cantidad||0; t.fob+=r.fob; t.fobAduana+=r.fobAduana; t.presupuesto+=r.presupuesto; });
+  return t;
+}
+function fmtQty(n){ return Math.round(n).toLocaleString('es-AR'); }
+
+// Tarjetas por estado (orden del circuito; estados nuevos van al final por nombre).
+const ESTADO_ORDER = ['NUEVA COMPRA','PRODUCCION','COORDINANDO / PRODUCCION','COORDINANDO','EN CERTIFICACION','EN CHINA','STOCK CHINA',
+  'BOOKING','ON SEA','ARRIBADO','FISCAL','OFICIALIZADO','GBR DISPONER','ENTREGADO','DESDE ODOO'];
+function estadoRank(e){ const i = ESTADO_ORDER.indexOf(e); return i<0 ? 999 : i; }
+// Primera tarjeta = total del mes elegido (o de todos los meses). Tocar una tarjeta filtra la tabla por ese estado;
+// tocar el total o la tarjeta ya activa vuelve a mostrar todos.
+function renderDetCards(rows){
+  const m = new Map();
+  rows.forEach(r=>{
+    const k = estadoOf(r);
+    if(!m.has(k)) m.set(k, {estado:k, n:0, fobAduana:0, presupuesto:0});
+    const t = m.get(k); t.n++; t.fobAduana += r.fobAduana; t.presupuesto += r.presupuesto;
+  });
+  const list = [...m.values()].sort((a,b)=>estadoRank(a.estado)-estadoRank(b.estado) || a.estado.localeCompare(b.estado,'es'));
+  const tot = sumRows(rows);
+  const card = (key, name, n, fa, pr, cls, tip)=>'<button type="button" class="est-card'+cls+'" data-estado="'+escHtml(key)+'" title="'+tip+'">'
+    + '<span class="est-name"><span>'+escHtml(name)+'</span><span class="est-lines">'+n+' línea(s)</span></span>'
+    + '<span class="est-row"><span>FOB Aduana</span><b>'+fmtUsd(fa)+'</b></span>'
+    + '<span class="est-row"><span>Presup. Aduana</span><b>'+fmtUsd(pr)+'</b></span>'
+    + '</button>';
+  const box = document.getElementById('detCards');
+  box.style.display = list.length ? 'grid' : 'none';
+  box.innerHTML = !list.length ? '' :
+    card('', 'TOTAL '+(DET_MES || 'TODOS LOS MESES'), rows.length, tot.fobAduana, tot.presupuesto, ' total'+(DET_ESTADO?'':' active'), 'Ver todos los estados')
+    + list.map(t=>card(t.estado, t.estado, t.n, t.fobAduana, t.presupuesto, t.estado===DET_ESTADO?' active':'', 'Ver solo '+escHtml(t.estado))).join('');
+  box.querySelectorAll('.est-card').forEach(c=>{
+    c.onclick = ()=>{ const e = c.dataset.estado; DET_ESTADO = (e && e!==DET_ESTADO) ? e : ''; renderDetail(); };
+  });
+}
+
+function renderDetMesOptions(){
+  const sel = document.getElementById('detMes');
+  const buckets = buildBuckets(ROWS.filter(r=>r.consignee===ACTIVE_CONSIGNEE));
+  if(DET_MES && !buckets.some(b=>b.label===DET_MES)) DET_MES = '';
+  sel.innerHTML = '<option value="">Todos los meses</option>'
+    + buckets.map(b=>'<option value="'+escHtml(b.label)+'">'+escHtml(b.label)+'</option>').join('');
+  sel.value = DET_MES;
+}
+
+function renderDetail(){
+  if(!CURRENT_COUNTRY) return;
+  renderDetMesOptions();
+  const base = detBaseRows();
+  if(DET_ESTADO && !base.some(r=>estadoOf(r)===DET_ESTADO)) DET_ESTADO = '';
+  renderDetCards(base);
+  const groups = detGroups();
+  const all = groups.flatMap(g=>g.rows);
+  document.getElementById('detTitle').textContent = 'Detalle productos — '+(ACTIVE_CONSIGNEE||'—');
+  document.getElementById('detNote').textContent = all.length+' línea(s) · '+(DET_MES ? 'pago aduana '+DET_MES : 'todos los meses de pago aduana')
+    + (DET_ESTADO ? ' · solo '+DET_ESTADO : '');
+
+  const line = r=>'<tr><td class="txt">'+escHtml(r.producto||'')+'</td><td class="txt">'+escHtml(r.modelo||'')+'</td>'
+    + '<td class="txt code">'+escHtml(r.contenedor||'').replace(/\//g,'/<wbr>')+'</td><td class="txt code bl">'+escHtml(r.bl||'')+'</td>'
+    + '<td>'+fmtQty(r.cantidad||0)+'</td><td>'+fmtUsd(r.fob)+'</td><td>'+fmtUsd(r.fobAduana)+'</td><td>'+fmtUsd(r.presupuesto)+'</td>'
+    + '<td class="txt estado">'+escHtml(r.estado||'')+'</td><td class="dt">'+escHtml(fmtSheetDate(r.etd))+'</td><td class="dt">'+escHtml(fmtSheetDate(r.eta))+'</td></tr>';
+  const sums = (label, t, cls)=>'<tr'+(cls?' class="'+cls+'"':'')+'><td colspan="4">'+escHtml(label)+'</td>'
+    + '<td>'+fmtQty(t.cantidad)+'</td><td>'+fmtUsd(t.fob)+'</td><td>'+fmtUsd(t.fobAduana)+'</td><td>'+fmtUsd(t.presupuesto)+'</td><td colspan="3"></td></tr>';
+
+  let bh = '';
+  groups.forEach(g=>{
+    if(!DET_MES) bh += '<tr class="det-month"><td colspan="11">'+escHtml(g.label)+' · '+g.rows.length+' línea(s)</td></tr>';
+    bh += g.rows.map(line).join('');
+    if(!DET_MES) bh += sums('Subtotal '+g.label, sumRows(g.rows), 'det-sub');
+  });
+  if(!all.length) bh = '<tr><td colspan="11" class="det-empty">Sin líneas para este consignee.</td></tr>';
+  document.getElementById('detBody').innerHTML = bh;
+  document.getElementById('detFoot').innerHTML = all.length
+    ? sums('Total '+(ACTIVE_CONSIGNEE||'')+(DET_MES ? ' — '+DET_MES : '')+(DET_ESTADO ? ' — '+DET_ESTADO : ''), sumRows(all), '') : '';
+}
+
+function exportDetailToExcel(){
+  const country = currentCountry();
+  const groups = detGroups();
+  const all = groups.flatMap(g=>g.rows);
+  if(!all.length){ alert('No hay líneas para exportar.'); return; }
+  const TXT = ' style="mso-number-format:\\@"';
+  const n = v=>Math.round(v||0);
+  let html = '<table border="1"><thead><tr><th>Mes de pago</th><th>Producto</th><th>Modelo</th><th>Contenedor</th><th>BL</th><th>Cantidad</th><th>FOB Supplier</th><th>FOB Aduana</th><th>Presupuesto Aduana</th><th>Estado</th><th>ETD</th><th>ETA</th></tr></thead><tbody>';
+  groups.forEach(g=>g.rows.forEach(r=>{
+    html += '<tr><td>'+escHtml(g.label)+'</td><td>'+escHtml(r.producto||'')+'</td><td'+TXT+'>'+escHtml(r.modelo||'')+'</td>'
+      + '<td'+TXT+'>'+escHtml(r.contenedor||'')+'</td><td'+TXT+'>'+escHtml(r.bl||'')+'</td>'
+      + '<td>'+n(r.cantidad)+'</td><td>'+n(r.fob)+'</td><td>'+n(r.fobAduana)+'</td><td>'+n(r.presupuesto)+'</td>'
+      + '<td>'+escHtml(r.estado||'')+'</td><td>'+escHtml(fmtSheetDate(r.etd))+'</td><td>'+escHtml(fmtSheetDate(r.eta))+'</td></tr>';
+  }));
+  const t = sumRows(all);
+  html += '<tr><td colspan="5"><b>Total '+escHtml(ACTIVE_CONSIGNEE||'')+'</b></td><td><b>'+n(t.cantidad)+'</b></td><td><b>'+n(t.fob)+'</b></td><td><b>'+n(t.fobAduana)+'</b></td><td><b>'+n(t.presupuesto)+'</b></td><td colspan="3"></td></tr>';
+  html += '</tbody></table>';
+  const ts = new Date();
+  downloadXls(html, 'Cashflow_Aduana_Detalle_'+country.code+'_'+(ACTIVE_CONSIGNEE||'')+'_'+((DET_MES||'TODOS')+(DET_ESTADO ? '_'+DET_ESTADO : '')).replace(/[^A-Za-z0-9]+/g,'_')
+    +'_'+ts.getFullYear()+String(ts.getMonth()+1).padStart(2,'0')+String(ts.getDate()).padStart(2,'0')+'.xls');
+}
+
 function setView(v){
   ACTIVE_VIEW = v;
+  document.body.classList.toggle('wide', v==='det' || v==='hist');
   document.getElementById('viewTabActual').classList.toggle('active', v==='actual');
+  document.getElementById('viewTabDet').classList.toggle('active', v==='det');
   document.getElementById('viewTabHist').classList.toggle('active', v==='hist');
   document.getElementById('viewActual').style.display = v==='actual' ? 'block' : 'none';
+  document.getElementById('viewDet').style.display = v==='det' ? 'block' : 'none';
   document.getElementById('viewHist').style.display = v==='hist' ? 'block' : 'none';
   if(v==='hist') renderHistory();
+  if(v==='det') renderDetail();
 }
 
 function escHtml(s){
@@ -571,7 +947,7 @@ function renderConsigTabs(){
     tab.type = 'button';
     tab.className = 'consig-tab' + (name===ACTIVE_CONSIGNEE ? ' active' : '');
     tab.textContent = name;
-    tab.onclick = ()=>{ ACTIVE_CONSIGNEE = name; renderConsigTabs(); renderTable(); renderHistory(); };
+    tab.onclick = ()=>{ ACTIVE_CONSIGNEE = name; renderConsigTabs(); renderTable(); renderDetail(); renderHistory(); };
     bar.appendChild(tab);
   });
 }
@@ -586,7 +962,10 @@ function renderTable(){
   buckets.forEach(b=>{
     totalFob += b.fob; totalFobAduana += b.fobAduana; totalPresupuesto += b.presupuesto;
     const tr = document.createElement('tr');
-    tr.innerHTML = '<td>'+b.label+'</td><td>'+fmtUsd(b.fob)+'</td><td>'+fmtUsd(b.fobAduana)+'</td><td>'+fmtUsd(b.presupuesto)+'</td>';
+    tr.className = 'clickable';
+    tr.title = 'Ver detalle de productos de '+b.label;
+    tr.innerHTML = '<td>'+escHtml(b.label)+'</td><td>'+fmtUsd(b.fob)+'</td><td>'+fmtUsd(b.fobAduana)+'</td><td>'+fmtUsd(b.presupuesto)+'</td>';
+    tr.onclick = ()=>{ DET_MES = b.label; DET_ESTADO = ''; setView('det'); };
     body.appendChild(tr);
   });
 
@@ -603,6 +982,7 @@ function renderAll(){
   if(!ACTIVE_CONSIGNEE || !CONSIGNEES.includes(ACTIVE_CONSIGNEE)) ACTIVE_CONSIGNEE = CONSIGNEES[0] || null;
   renderConsigTabs();
   renderTable();
+  renderDetail();
   renderHistory();
 }
 
@@ -671,7 +1051,6 @@ async function fetchFromGoogleSheets(opts){
   if(!silent){ btn.disabled = true; btn.textContent = 'Actualizando...'; }
   try{
     const {rows, meta} = await fetchCountryData(country);
-    maybeAutoSnapshot(country.code, rows);
     if(CURRENT_COUNTRY !== country.code) return; // el usuario cambió de país mientras cargaba
     loadIntoState(rows, meta);
     persist();
@@ -706,7 +1085,7 @@ function renderCountryTabs(){
 
 function selectCountry(country){
   CURRENT_COUNTRY = country.code;
-  ROWS = []; META = null; CONSIGNEES = []; ACTIVE_CONSIGNEE = null;
+  ROWS = []; META = null; CONSIGNEES = []; ACTIVE_CONSIGNEE = null; DET_MES = ''; DET_ESTADO = '';
   renderCountryTabs();
   hideUpdateWarning();
   document.getElementById('consigTabs').style.display = 'none';
@@ -717,19 +1096,22 @@ function selectCountry(country){
   return fetchFromGoogleSheets({silent:true});
 }
 
-document.getElementById('btnLoad').onclick = ()=>fetchFromGoogleSheets({});
+document.getElementById('btnLoad').onclick = async ()=>{ await fetchFromGoogleSheets({}); loadPublished(); };
 document.getElementById('btnLoadEmpty').onclick = ()=>fetchFromGoogleSheets({});
 document.getElementById('btnExport').onclick = ()=>exportToExcel();
 document.getElementById('viewTabActual').onclick = ()=>setView('actual');
 document.getElementById('viewTabHist').onclick = ()=>setView('hist');
-document.getElementById('btnSnapNow').onclick = ()=>saveManualSnapshot();
+document.getElementById('viewTabDet').onclick = ()=>setView('det');
+document.getElementById('detMes').onchange = (e)=>{ DET_MES = e.target.value; renderDetail(); };
+document.getElementById('btnExportDet').onclick = ()=>exportDetailToExcel();
+document.getElementById('btnSnapNow').onclick = ()=>saveDraft();
 document.getElementById('btnExportHist').onclick = ()=>exportHistoryToExcel();
 
-setInterval(async ()=>{ await fetchFromGoogleSheets({silent:true}); runAutoSnapshots(); }, 30*60*1000);
+setInterval(async ()=>{ await fetchFromGoogleSheets({silent:true}); loadPublished(); }, 30*60*1000);
 
 (async ()=>{
   await selectCountry(COUNTRIES[0]);
-  runAutoSnapshots(); // foto automática de los demás países si corresponde
+  loadPublished();
 })();
 </script>
 </body>
