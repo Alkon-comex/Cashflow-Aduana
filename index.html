@@ -135,6 +135,11 @@
   .est-card .est-lines{font-size:11px; color:var(--muted); font-weight:500; white-space:nowrap;}
   .est-card .est-row{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12px; color:var(--text-secondary); margin-top:6px;}
   .est-card .est-row b{color:var(--text-primary); font-size:14px; white-space:nowrap;}
+  table.cf tbody tr.grp-row td{background:#eef3fa !important; color:var(--brand-navy); font-weight:700; cursor:pointer;}
+  table.cf tbody tr.grp-row:hover td{background:#e3ecf8 !important;}
+  table.cf tr.grp-row .caret{display:inline-block; width:16px; font-size:11px;}
+  table.cf tr.grp-row .grp-count{font-weight:500; color:var(--muted); font-size:11.5px; margin-left:8px;}
+  table.cf tbody tr.sub td:first-child{padding-left:34px;}
   table.cf tbody tr.clickable{cursor:pointer;}
   table.cf tbody tr.clickable:hover td{background:#eef2f8;}
 
@@ -246,6 +251,7 @@
         <h2 id="histTitle">Historial</h2>
         <span class="tc-note" id="histNote"></span>
         <div class="tc-actions">
+          <button type="button" class="btn" id="btnToggleHist" style="border:1px solid var(--brand-navy);">Abrir todo</button>
           <button type="button" class="btn" id="btnSnapNow" style="background:var(--brand-navy); color:#fff;">Guardar borrador</button>
           <button type="button" class="btn" id="btnExportHist" style="border:1px solid var(--brand-navy);">Exportar historial a Excel</button>
         </div>
@@ -264,7 +270,10 @@
       <div class="tc-head">
         <h2 id="tcTitle">Cashflow Aduana por mes de pago</h2>
         <span class="tc-note" id="tcNote"></span>
-        <button type="button" class="btn" id="btnExport" style="background:var(--brand-navy); color:#fff;">Exportar a Excel</button>
+        <div class="tc-actions">
+          <button type="button" class="btn" id="btnToggleCf" style="border:1px solid var(--brand-navy);">Abrir todo</button>
+          <button type="button" class="btn" id="btnExport" style="background:var(--brand-navy); color:#fff;">Exportar a Excel</button>
+        </div>
       </div>
       <div class="tablewrap">
         <table class="cf">
@@ -463,6 +472,42 @@ function bucketCmp(a,b){
   if(a.isMonth && !b.isMonth) return -1;
   if(!a.isMonth && b.isMonth) return 1;
   return a.label.localeCompare(b.label,'es');
+}
+
+/* ===================== AGRUPADO POR AÑO ===================== */
+// Cuadro actual e Historial se agrupan por año del mes de pago; lo que no es mes (FISCAL, STOCK CHINA...) va a "Otros".
+// Arranca todo cerrado. Cada vista guarda por separado qué años tiene abiertos (solo mientras la página está abierta).
+const OPEN_CF = new Set();     // Cuadro actual
+const OPEN_HIST = new Set();   // Historial
+function groupKey(b){ return (b.isMonth && b.sortKey) ? String(Math.floor(b.sortKey/100)) : 'OTROS'; }
+function groupBuckets(list){   // list ya ordenada con bucketCmp
+  const groups = [], byKey = new Map();
+  list.forEach(b=>{
+    const k = groupKey(b);
+    if(!byKey.has(k)){ const g = {key:k, label: k==='OTROS' ? 'Otros' : k, items:[]}; byKey.set(k, g); groups.push(g); }
+    byKey.get(k).items.push(b);
+  });
+  return groups;
+}
+function sumBuckets(list){
+  const t = {fob:0, fobAduana:0, presupuesto:0};
+  list.forEach(b=>{ if(!b) return; t.fob += b.fob; t.fobAduana += b.fobAduana; t.presupuesto += b.presupuesto; });
+  return t;
+}
+function grpLabelHtml(g, open){
+  const n = g.items.length;
+  return '<span class="caret">'+(open ? '▾' : '▸')+'</span>'+escHtml(g.label)
+    + '<span class="grp-count">'+n+' '+(g.key==='OTROS' ? (n===1 ? 'rubro' : 'rubros') : (n===1 ? 'mes' : 'meses'))+'</span>';
+}
+function allOpen(set, groups){ return groups.length>0 && groups.every(g=>set.has(g.key)); }
+function toggleGroup(set, k, render){
+  if(set.has(k)) set.delete(k); else set.add(k);
+  render();
+}
+function toggleAll(set, groups, render){
+  const close = allOpen(set, groups);
+  groups.forEach(g=> close ? set.delete(g.key) : set.add(g.key));
+  render();
 }
 
 /* ===================== HISTORIAL ===================== */
@@ -723,17 +768,29 @@ function renderHistory(){
     b.onclick = ()=> b.dataset.act==='pub' ? publishDraft(b.dataset.id) : deleteDraft(b.dataset.id);
   });
 
+  const groups = groupBuckets(rowsOut);
   let bh = '';
-  rowsOut.forEach(r=>{
-    bh += '<tr><td>'+escHtml(r.label)+'</td>';
+  groups.forEach(g=>{
+    const open = OPEN_HIST.has(g.key);
+    bh += '<tr class="grp-row" data-grp="'+escHtml(g.key)+'" title="'+(open ? 'Cerrar ' : 'Abrir ')+escHtml(g.label)+'"><td>'+grpLabelHtml(g, open)+'</td>';
     maps.forEach(m=>{
-      const b = m.get(r.label);
-      const v = b || {fob:0, fobAduana:0, presupuesto:0};
-      bh += '<td class="grp">'+fmtUsd(v.fob)+'</td><td>'+fmtUsd(v.fobAduana)+'</td><td>'+fmtUsd(v.presupuesto)+'</td>';
+      const t = sumBuckets(g.items.map(r=>m.get(r.label)));
+      bh += '<td class="grp">'+fmtUsd(t.fob)+'</td><td>'+fmtUsd(t.fobAduana)+'</td><td>'+fmtUsd(t.presupuesto)+'</td>';
     });
     bh += '</tr>';
+    if(!open) return;
+    g.items.forEach(r=>{
+      bh += '<tr class="sub"><td>'+escHtml(r.label)+'</td>';
+      maps.forEach(m=>{
+        const v = m.get(r.label) || {fob:0, fobAduana:0, presupuesto:0};
+        bh += '<td class="grp">'+fmtUsd(v.fob)+'</td><td>'+fmtUsd(v.fobAduana)+'</td><td>'+fmtUsd(v.presupuesto)+'</td>';
+      });
+      bh += '</tr>';
+    });
   });
   body.innerHTML = bh;
+  body.querySelectorAll('tr.grp-row').forEach(tr=>{ tr.onclick = ()=>toggleGroup(OPEN_HIST, tr.dataset.grp, renderHistory); });
+  document.getElementById('btnToggleHist').textContent = allOpen(OPEN_HIST, groups) ? 'Cerrar todo' : 'Abrir todo';
 
   let fh = '<tr><td>Total '+escHtml(ACTIVE_CONSIGNEE||'')+'</td>';
   totals.forEach(t=>{
@@ -751,9 +808,14 @@ function exportHistoryToExcel(){
   html += '</tr><tr>';
   snaps.forEach(()=>{ html += '<th>Suma de FOB Supplier</th><th>Suma de FOB Aduana</th><th>Suma de Presupuesto Aduana</th>'; });
   html += '</tr></thead><tbody>';
-  rowsOut.forEach(r=>{
-    html += '<tr><td>'+escHtml(r.label)+'</td>';
-    maps.forEach(m=>{ const b = m.get(r.label) || {fob:0, fobAduana:0, presupuesto:0}; html += '<td>'+b.fob+'</td><td>'+b.fobAduana+'</td><td>'+b.presupuesto+'</td>'; });
+  groupBuckets(rowsOut).forEach(g=>{
+    g.items.forEach(r=>{
+      html += '<tr><td>'+escHtml(r.label)+'</td>';
+      maps.forEach(m=>{ const b = m.get(r.label) || {fob:0, fobAduana:0, presupuesto:0}; html += '<td>'+Math.round(b.fob)+'</td><td>'+Math.round(b.fobAduana)+'</td><td>'+Math.round(b.presupuesto)+'</td>'; });
+      html += '</tr>';
+    });
+    html += '<tr><td><b>Subtotal '+escHtml(g.label)+'</b></td>';
+    maps.forEach(m=>{ const t = sumBuckets(g.items.map(r=>m.get(r.label))); html += '<td><b>'+Math.round(t.fob)+'</b></td><td><b>'+Math.round(t.fobAduana)+'</b></td><td><b>'+Math.round(t.presupuesto)+'</b></td>'; });
     html += '</tr>';
   });
   html += '<tr><td><b>Total '+escHtml(ACTIVE_CONSIGNEE||'')+'</b></td>';
@@ -920,9 +982,13 @@ function exportToExcel(){
 
   let totalFob=0, totalFobAduana=0, totalPresupuesto=0;
   let html = '<table border="1"><thead><tr><th>Mes de pago</th><th>Suma de FOB Supplier</th><th>Suma de FOB Aduana</th><th>Suma de Presupuesto Aduana</th></tr></thead><tbody>';
-  buckets.forEach(b=>{
-    totalFob += b.fob; totalFobAduana += b.fobAduana; totalPresupuesto += b.presupuesto;
-    html += '<tr><td>'+escHtml(b.label)+'</td><td>'+Math.round(b.fob)+'</td><td>'+Math.round(b.fobAduana)+'</td><td>'+Math.round(b.presupuesto)+'</td></tr>';
+  buckets.forEach(b=>{ totalFob += b.fob; totalFobAduana += b.fobAduana; totalPresupuesto += b.presupuesto; });
+  groupBuckets(buckets).forEach(g=>{
+    g.items.forEach(b=>{
+      html += '<tr><td>'+escHtml(b.label)+'</td><td>'+Math.round(b.fob)+'</td><td>'+Math.round(b.fobAduana)+'</td><td>'+Math.round(b.presupuesto)+'</td></tr>';
+    });
+    const t = sumBuckets(g.items);
+    html += '<tr><td><b>Subtotal '+escHtml(g.label)+'</b></td><td><b>'+Math.round(t.fob)+'</b></td><td><b>'+Math.round(t.fobAduana)+'</b></td><td><b>'+Math.round(t.presupuesto)+'</b></td></tr>';
   });
   html += '<tr><td><b>Total '+escHtml(ACTIVE_CONSIGNEE||'')+'</b></td><td><b>'+Math.round(totalFob)+'</b></td><td><b>'+Math.round(totalFobAduana)+'</b></td><td><b>'+Math.round(totalPresupuesto)+'</b></td></tr>';
   html += '</tbody></table>';
@@ -959,15 +1025,28 @@ function renderTable(){
   const buckets = buildBuckets(rows);
 
   let totalFob=0, totalFobAduana=0, totalPresupuesto=0;
-  buckets.forEach(b=>{
-    totalFob += b.fob; totalFobAduana += b.fobAduana; totalPresupuesto += b.presupuesto;
-    const tr = document.createElement('tr');
-    tr.className = 'clickable';
-    tr.title = 'Ver detalle de productos de '+b.label;
-    tr.innerHTML = '<td>'+escHtml(b.label)+'</td><td>'+fmtUsd(b.fob)+'</td><td>'+fmtUsd(b.fobAduana)+'</td><td>'+fmtUsd(b.presupuesto)+'</td>';
-    tr.onclick = ()=>{ DET_MES = b.label; DET_ESTADO = ''; setView('det'); };
-    body.appendChild(tr);
+  buckets.forEach(b=>{ totalFob += b.fob; totalFobAduana += b.fobAduana; totalPresupuesto += b.presupuesto; });
+  const groups = groupBuckets(buckets);
+  groups.forEach(g=>{
+    const open = OPEN_CF.has(g.key);
+    const t = sumBuckets(g.items);
+    const gr = document.createElement('tr');
+    gr.className = 'grp-row';
+    gr.title = (open ? 'Cerrar ' : 'Abrir ')+g.label;
+    gr.innerHTML = '<td>'+grpLabelHtml(g, open)+'</td><td>'+fmtUsd(t.fob)+'</td><td>'+fmtUsd(t.fobAduana)+'</td><td>'+fmtUsd(t.presupuesto)+'</td>';
+    gr.onclick = ()=>toggleGroup(OPEN_CF, g.key, renderTable);
+    body.appendChild(gr);
+    if(!open) return;
+    g.items.forEach(b=>{
+      const tr = document.createElement('tr');
+      tr.className = 'clickable sub';
+      tr.title = 'Ver detalle de productos de '+b.label;
+      tr.innerHTML = '<td>'+escHtml(b.label)+'</td><td>'+fmtUsd(b.fob)+'</td><td>'+fmtUsd(b.fobAduana)+'</td><td>'+fmtUsd(b.presupuesto)+'</td>';
+      tr.onclick = ()=>{ DET_MES = b.label; DET_ESTADO = ''; setView('det'); };
+      body.appendChild(tr);
+    });
   });
+  document.getElementById('btnToggleCf').textContent = allOpen(OPEN_CF, groups) ? 'Cerrar todo' : 'Abrir todo';
 
   document.getElementById('tcTitle').textContent = 'Cashflow Aduana por mes de pago — '+(ACTIVE_CONSIGNEE||'—');
   document.getElementById('cfTotalLabel').textContent = 'Total '+(ACTIVE_CONSIGNEE||'');
@@ -1104,6 +1183,8 @@ document.getElementById('viewTabHist').onclick = ()=>setView('hist');
 document.getElementById('viewTabDet').onclick = ()=>setView('det');
 document.getElementById('detMes').onchange = (e)=>{ DET_MES = e.target.value; renderDetail(); };
 document.getElementById('btnExportDet').onclick = ()=>exportDetailToExcel();
+document.getElementById('btnToggleCf').onclick = ()=>toggleAll(OPEN_CF, groupBuckets(buildBuckets(ROWS.filter(r=>r.consignee===ACTIVE_CONSIGNEE))), renderTable);
+document.getElementById('btnToggleHist').onclick = ()=>toggleAll(OPEN_HIST, groupBuckets(histData().rowsOut), renderHistory);
 document.getElementById('btnSnapNow').onclick = ()=>saveDraft();
 document.getElementById('btnExportHist').onclick = ()=>exportHistoryToExcel();
 
